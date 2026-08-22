@@ -1,7 +1,8 @@
 const clean = (value) => String(value ?? '').trim()
 const valueFrom = (row, names) => { const key = Object.keys(row).find((item) => names.some((name) => item.trim().toLowerCase() === name.toLowerCase())); return key ? row[key] : '' }
 export function normalizeEmployeeRow(row) {
-  return { company: clean(valueFrom(row, ['Company'])), employeeId: clean(valueFrom(row, ['Employee ID', 'EmployeeId', 'Emp ID'])), employeeName: clean(valueFrom(row, ['Employee Name', 'EmployeeName', 'Emp Name'])), subProjectId: clean(valueFrom(row, ['Sub-Proj ID', 'Sub Project ID'])), subProjectName: clean(valueFrom(row, ['Sub-Proj Name', 'Sub Project Name'])), budgeted: clean(valueFrom(row, ['Budgeted'])), dateOfJoining: valueFrom(row, ['Date of Joining', 'DOJ']), excelacomExperience: clean(valueFrom(row, ['Excelacom Experience', 'Experience'])), finalCustomer: clean(valueFrom(row, ['Final Customer'])), status: 'Active' }
+  const costDate = valueFrom(row, ['Per Hour Cost Date', 'Cost Effective Date']), perHourCost = clean(valueFrom(row, ['Per Hour Cost', 'Hourly Cost']))
+  return { company: clean(valueFrom(row, ['Company'])), employeeId: clean(valueFrom(row, ['Employee ID', 'EmployeeId', 'Emp ID'])), employeeName: clean(valueFrom(row, ['Employee Name', 'EmployeeName', 'Emp Name'])), subProjectId: clean(valueFrom(row, ['Sub-Proj ID', 'Sub Project ID'])), subProjectName: clean(valueFrom(row, ['Sub-Proj Name', 'Sub Project Name'])), budgeted: clean(valueFrom(row, ['Budgeted'])), dateOfJoining: valueFrom(row, ['Date of Joining', 'DOJ']), excelacomExperience: clean(valueFrom(row, ['Excelacom Experience', 'Experience'])), finalCustomer: clean(valueFrom(row, ['Final Customer'])), ctc: clean(valueFrom(row, ['CTC'])), perHourCostDetails: costDate || perHourCost ? [{ date: costDate, perHourCost }] : [], status: 'Active' }
 }
 export function validateEmployeeRows(rows, projects, subProjects, employees) {
   return rows.map((source, index) => {
