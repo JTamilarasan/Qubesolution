@@ -7,6 +7,7 @@ import DashboardPage from '../pages/dashboard/DashboardPage'
 import EmployeeMasterPage from '../pages/masters/EmployeeMasterPage'
 import ForecastMasterPage from '../pages/masters/ForecastMasterPage'
 import ProjectMasterPage from '../pages/masters/ProjectMasterPage'
+import ProjectCategoryMasterPage from '../pages/masters/ProjectCategoryMasterPage'
 import SubProjectMasterPage from '../pages/masters/SubProjectMasterPage'
 import AttendancePage from '../pages/operations/AttendancePage'
 import EmployeeImportPage from '../pages/operations/EmployeeImportPage'
@@ -22,11 +23,13 @@ function AppRouter() {
     <Route path="/forgot-password" element={<PublicRoute><ForgotPasswordPage /></PublicRoute>} />
     <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
       <Route path="/dashboard" element={<DashboardPage />} />
-      <Route path="/employees" element={<EmployeeMasterPage />} />
+      <Route path="/employees" element={<Navigate to="/masters/employees" replace />} />
       <Route path="/attendance" element={<AttendancePage />} />
       <Route path="/labour-hours" element={<LabourHoursPage />} />
       <Route path="/masters/projects" element={<ProjectMasterPage />} />
+      <Route path="/masters/project-categories" element={<ProjectCategoryMasterPage />} />
       <Route path="/masters/sub-projects" element={<SubProjectMasterPage />} />
+      <Route path="/masters/employees" element={<EmployeeMasterPage />} />
       <Route path="/masters/forecast" element={<ForecastMasterPage />} />
       <Route path="/imports/employees" element={<EmployeeImportPage />} />
       <Route path="/imports/payroll" element={<PayrollImportPage />} />

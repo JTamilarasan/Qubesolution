@@ -28,10 +28,10 @@ const collapsedWidth = 72
 const navigation = [
   { section: 'OVERVIEW', items: [{ label: 'Dashboard', path: '/dashboard', icon: DashboardRoundedIcon }] },
   { section: 'WORKFORCE', items: [
-    { label: 'Employees', path: '/employees', icon: PeopleAltRoundedIcon }, { label: 'Attendance', path: '/attendance', icon: EventAvailableRoundedIcon }, { label: 'Labour Hours', path: '/labour-hours', icon: AccessTimeRoundedIcon },
+    { label: 'Attendance', path: '/attendance', icon: EventAvailableRoundedIcon }, { label: 'Labour Hours', path: '/labour-hours', icon: AccessTimeRoundedIcon },
   ] },
   { section: 'MASTERS', items: [
-    { label: 'Project Master', path: '/masters/projects', icon: AccountTreeRoundedIcon }, { label: 'Sub Project Master', path: '/masters/sub-projects', icon: BadgeRoundedIcon }, { label: 'Forecast Master', path: '/masters/forecast', icon: InsightsRoundedIcon },
+    { label: 'Project Category', path: '/masters/project-categories', icon: AccountTreeRoundedIcon }, { label: 'Project Master', path: '/masters/projects', icon: AccountTreeRoundedIcon }, { label: 'Sub Project Master', path: '/masters/sub-projects', icon: BadgeRoundedIcon }, { label: 'Employee Master', path: '/masters/employees', icon: PeopleAltRoundedIcon }, { label: 'Forecast Master', path: '/masters/forecast', icon: InsightsRoundedIcon },
   ] },
   { section: 'IMPORTS', items: [
     { label: 'Employee Import', path: '/imports/employees', icon: UploadFileRoundedIcon }, { label: 'Payroll Import', path: '/imports/payroll', icon: ReceiptLongRoundedIcon },

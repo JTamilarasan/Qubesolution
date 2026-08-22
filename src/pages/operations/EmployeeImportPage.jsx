@@ -30,7 +30,7 @@ function EmployeeImportPage() {
     if (!valid.length) return
     setImporting(true); setError('')
     try {
-      await createRecords('employees', valid.map((row) => ({ employeeId: row.employeeId, employeeName: row.employeeName, email: row.email, projectId: row.projectId, projectName: row.projectName, subProjectId: row.subProjectId, subProjectName: row.subProjectName, budgeted: row.budgeted, rollOnDate: row.rollOnDate, rollOffDate: row.rollOffDate, dateOfJoining: row.dateOfJoining, experience: row.experience, status: row.status, exitDate: row.exitDate, finalCustomer: row.finalCustomer })))
+      await createRecords('employees', valid.map((row) => ({ company: row.company, employeeId: row.employeeId, employeeName: row.employeeName, subProjectDocumentId: row.subProjectDocumentId, subProjectId: row.subProjectId, subProjectName: row.subProjectName, projectCategoryId: row.projectCategoryId, projectCategoryName: row.projectCategoryName, projectDocumentId: row.projectDocumentId, projectId: row.projectId, projectName: row.projectName, budgeted: row.budgeted, rollOnDate: row.rollOnDate, rollOffDate: row.rollOffDate, dateOfJoining: row.dateOfJoining, excelacomExperience: row.excelacomExperience, finalCustomer: row.finalCustomer, status: row.status })))
       setComplete(true)
     } catch (requestError) { setError(requestError.message) } finally { setImporting(false) }
   }

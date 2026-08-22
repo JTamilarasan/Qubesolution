@@ -69,6 +69,17 @@ export const appTheme = createTheme({
     MuiInputLabel: { styleOverrides: { root: { fontSize: 14, fontWeight: 500 } } },
     MuiIconButton: { styleOverrides: { root: { borderRadius: 8 } } },
     MuiDialog: { styleOverrides: { paper: { borderRadius: 14, overflow: 'hidden' } } },
+    MuiSnackbar: {
+      defaultProps: { anchorOrigin: { vertical: 'top', horizontal: 'right' } },
+      styleOverrides: {
+        anchorOriginTopRight: {
+          top: '80px !important',
+          right: '24px !important',
+          '@media (max-width:600px)': { top: '16px !important', right: '12px !important', left: '12px !important' },
+          '& .MuiAlert-root': { minWidth: 300, boxShadow: '0 12px 32px rgba(17, 24, 39, .18)' },
+        },
+      },
+    },
     MuiCheckbox: {
       styleOverrides: { root: { '&.Mui-checked': { color: designTokens.orange } } },
     },
@@ -79,7 +90,7 @@ export const appTheme = createTheme({
       styleOverrides: { root: { backgroundColor: '#FAF9F6' } },
     },
     MuiTableRow: {
-      styleOverrides: { root: { '&.MuiTableRow-hover:hover': { backgroundColor: designTokens.softOrange } } },
+      styleOverrides: { root: { '&:nth-of-type(even)': { backgroundColor: '#FAFAF9' }, '& .MuiTableCell-root': { borderBottom: `1px solid ${designTokens.border}` }, '&.MuiTableRow-hover:hover': { backgroundColor: designTokens.softOrange } } },
     },
   },
 })

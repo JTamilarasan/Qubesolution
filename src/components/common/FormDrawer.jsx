@@ -15,16 +15,16 @@ function FormDrawer({ open, onClose, title, subtitle, children, onSubmit, saving
     } } }}>
     <Stack sx={{ minHeight: 0, maxHeight: 'inherit' }}>
       <Stack direction="row" justifyContent="space-between" alignItems="flex-start" gap={2} sx={{ px: '22px', pt: '20px', pb: '16px', flex: '0 0 auto' }}>
-        <Stack direction="row" gap={1.5} alignItems="stretch" sx={{ minWidth: 0 }}>
+        <Stack direction="row" alignItems="stretch" sx={{ minWidth: 0 }}>
           <Box sx={{ width: 3, minHeight: 40, borderRadius: 999, bgcolor: 'primary.main', flex: '0 0 auto' }} />
-          <Box sx={{ minWidth: 0 }}><Typography sx={{ fontSize: 20, lineHeight: 1.25, fontWeight: 700, color: 'secondary.main' }}>{title}</Typography>{subtitle && <Typography sx={{ mt: '3px', fontSize: 13, color: 'text.secondary', lineHeight: 1.4 }}>{subtitle}</Typography>}</Box>
+          <Box sx={{ minWidth: 0, ml: '12px' }}><Typography sx={{ fontSize: 20, lineHeight: 1.25, fontWeight: 700, color: 'secondary.main' }}>{title}</Typography>{subtitle && <Typography sx={{ mt: '3px', fontSize: 13, color: 'text.secondary', lineHeight: 1.4 }}>{subtitle}</Typography>}</Box>
         </Stack>
         <IconButton disabled={saving} onClick={onClose} aria-label="Close dialog" sx={{ width: 36, height: 36, flex: '0 0 auto', ml: 'auto', alignSelf: 'flex-start', color: 'text.secondary', '&:hover': { bgcolor: '#F3F4F6' } }}><CloseRoundedIcon sx={{ fontSize: 20 }} /></IconButton>
       </Stack>
       <Divider />
       <Box sx={{ p: '22px', flex: 1, minHeight: 0, overflowY: 'auto' }}>{children}</Box>
-      <Stack direction="row" justifyContent="flex-end" alignItems="center" gap="12px" sx={{ flex: '0 0 auto', bgcolor: 'background.paper', borderTop: '1px solid', borderColor: 'divider', px: '22px', pt: '16px', pb: '20px' }}>
-        <Button variant="outlined" color="secondary" onClick={onClose} disabled={saving} sx={{ height: 40, minWidth: 84 }}>Cancel</Button>
+      <Stack direction="row" alignItems="center" sx={{ display: 'flex', width: '100%', boxSizing: 'border-box', flex: '0 0 auto', bgcolor: 'background.paper', borderTop: '1px solid', borderColor: 'divider', px: '22px', pt: '16px', pb: '20px', '& .MuiButton-contained': { ml: '12px' } }}>
+        <Button variant="outlined" color="secondary" onClick={onClose} disabled={saving} sx={{ height: 40, minWidth: 84, ml: 'auto', flex: '0 0 auto' }}>Cancel</Button>
         <Button type="submit" variant="contained" disabled={saving} sx={{ height: 40, px: '18px' }}>{saving ? 'Saving…' : submitLabel}</Button>
       </Stack>
     </Stack>
