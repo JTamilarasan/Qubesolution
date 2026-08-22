@@ -2,6 +2,7 @@ import { useState } from 'react'
 import AccessTimeRoundedIcon from '@mui/icons-material/AccessTimeRounded'
 import AccountTreeRoundedIcon from '@mui/icons-material/AccountTreeRounded'
 import BadgeRoundedIcon from '@mui/icons-material/BadgeRounded'
+import CategoryRoundedIcon from '@mui/icons-material/CategoryRounded'
 import ChevronLeftRoundedIcon from '@mui/icons-material/ChevronLeftRounded'
 import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded'
 import EventAvailableRoundedIcon from '@mui/icons-material/EventAvailableRounded'
@@ -31,7 +32,7 @@ const navigation = [
     { label: 'Attendance', path: '/attendance', icon: EventAvailableRoundedIcon }, { label: 'Labour Hours', path: '/labour-hours', icon: AccessTimeRoundedIcon },
   ] },
   { section: 'MASTERS', items: [
-    { label: 'Project Category', path: '/masters/project-categories', icon: AccountTreeRoundedIcon }, { label: 'Project Master', path: '/masters/projects', icon: AccountTreeRoundedIcon }, { label: 'Sub Project Master', path: '/masters/sub-projects', icon: BadgeRoundedIcon }, { label: 'Employee Master', path: '/masters/employees', icon: PeopleAltRoundedIcon }, { label: 'Forecast Master', path: '/masters/forecast', icon: InsightsRoundedIcon },
+    { label: 'Project Category', path: '/masters/project-categories', icon: CategoryRoundedIcon }, { label: 'Project Master', path: '/masters/projects', icon: AccountTreeRoundedIcon }, { label: 'Sub Project Master', path: '/masters/sub-projects', icon: BadgeRoundedIcon }, { label: 'Employee Master', path: '/masters/employees', icon: PeopleAltRoundedIcon }, { label: 'Forecast Master', path: '/masters/forecast', icon: InsightsRoundedIcon },
   ] },
   { section: 'IMPORTS', items: [
     { label: 'Employee Import', path: '/imports/employees', icon: UploadFileRoundedIcon }, { label: 'Payroll Import', path: '/imports/payroll', icon: ReceiptLongRoundedIcon },
