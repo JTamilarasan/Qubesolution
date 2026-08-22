@@ -10,11 +10,7 @@ const features = [
 ]
 
 function BrandMark() {
-  return (
-    <Box sx={{ width: 34, height: 34, display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '4px', p: '5px', borderRadius: 1.5, bgcolor: 'primary.main', flex: '0 0 auto' }} aria-hidden="true">
-      {[0, 1, 2, 3].map((item) => <Box key={item} sx={{ bgcolor: 'secondary.main', borderRadius: '2px' }} />)}
-    </Box>
-  )
+  return <Box component="img" src="/excelacom-mark.svg" alt="Excelacom" sx={{ width: 42, height: 36, objectFit: 'contain', bgcolor: '#FFFFFF', borderRadius: 1.25, p: .5, flex: '0 0 auto' }} />
 }
 
 function AuthLayout({ children }) {
@@ -26,7 +22,7 @@ function AuthLayout({ children }) {
             <Stack direction="row" spacing={1.4} alignItems="center">
               <BrandMark />
               <Box sx={{ minWidth: 0 }}>
-                <Typography fontSize={19} fontWeight={700} lineHeight={1.15}>Qubex</Typography>
+                <Typography fontSize={19} fontWeight={700} lineHeight={1.15}>Excelacom</Typography>
                 <Typography variant="caption" sx={{ color: 'rgba(255,255,255,.62)', letterSpacing: '.015em', fontSize: { xs: 10, sm: 11 } }}>Workforce Intelligence &amp; Operations</Typography>
               </Box>
             </Stack>

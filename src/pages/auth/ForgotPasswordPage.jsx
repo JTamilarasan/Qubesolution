@@ -36,7 +36,7 @@ function ForgotPasswordPage() {
 
   return (
     <AuthLayout>
-      <AuthHeader title="Reset your password" description="Enter your registered Qubex email address and we'll send you a reset link." />
+      <AuthHeader title="Reset your password" description="Enter your registered Excelacom email address and we'll send you a reset link." />
       <Stack component="form" onSubmit={handleSubmit} noValidate spacing={2.25} sx={{ mt: 4 }}>
         <TextField
           fullWidth label="Email Address" name="email" type="email" autoComplete="email" autoFocus

@@ -42,8 +42,8 @@ const navigation = [
 function Brand({ compact = false }) {
   return (
     <Stack direction="row" spacing={1.25} alignItems="center" sx={{ minWidth: 0 }}>
-      <Box sx={{ width: 40, height: 40, flex: '0 0 auto', bgcolor: 'primary.main', borderRadius: 1.25, display: 'grid', placeItems: 'center', color: 'secondary.main', fontWeight: 900, fontSize: 20 }}>Q</Box>
-      {!compact && <Box sx={{ minWidth: 0 }}><Typography sx={{ color: '#FFFFFF', fontWeight: 700, fontSize: 18, lineHeight: 1.2 }}>Qubex</Typography><Typography sx={{ color: 'rgba(255,255,255,.64)', fontSize: 10.5, fontWeight: 400, lineHeight: 1.3, mt: .25 }} noWrap>Workforce Intelligence &amp; Operations</Typography></Box>}
+      <Box component="img" src="/excelacom-mark.svg" alt="Excelacom" sx={{ width: 42, height: 40, objectFit: 'contain', flex: '0 0 auto', bgcolor: '#FFFFFF', borderRadius: 1.25, p: .5 }} />
+      {!compact && <Box sx={{ minWidth: 0 }}><Typography sx={{ color: '#FFFFFF', fontWeight: 700, fontSize: 18, lineHeight: 1.2 }}>Excelacom</Typography><Typography sx={{ color: 'rgba(255,255,255,.64)', fontSize: 10.5, fontWeight: 400, lineHeight: 1.3, mt: .25 }} noWrap>Workforce Intelligence &amp; Operations</Typography></Box>}
     </Stack>
   )
 }
@@ -98,7 +98,7 @@ function AppLayout() {
             <IconButton onClick={() => setCollapsed((value) => !value)} sx={{ display: { xs: 'none', lg: 'inline-flex' }, mr: 1 }} aria-label="Toggle sidebar"><ChevronLeftRoundedIcon sx={{ transform: collapsed ? 'rotate(180deg)' : 'none' }} /></IconButton>
             <Box sx={{ display: { xs: 'block', lg: 'none' }, flex: 1 }}><Brand /></Box>
             <Box sx={{ display: { xs: 'none', lg: 'block' }, flex: 1 }}><Typography variant="caption" color="text.secondary">{current?.path.startsWith('/masters') ? 'Masters' : current?.path.startsWith('/imports') ? 'Imports' : 'Workforce'}</Typography><Typography fontWeight={700}>{current?.label || 'Dashboard'}</Typography></Box>
-            <TextField size="small" placeholder="Search Qubex…" sx={{ width: 240, display: { xs: 'none', md: 'block' }, mr: 1.5 }} slotProps={{ input: { startAdornment: <InputAdornment position="start"><SearchRoundedIcon fontSize="small" /></InputAdornment> } }} />
+            <TextField size="small" placeholder="Search Excelacom…" sx={{ width: 240, display: { xs: 'none', md: 'block' }, mr: 1.5 }} slotProps={{ input: { startAdornment: <InputAdornment position="start"><SearchRoundedIcon fontSize="small" /></InputAdornment> } }} />
             <Tooltip title="Help"><IconButton color="inherit" sx={{ display: { xs: 'none', sm: 'inline-flex' } }}><HelpOutlineRoundedIcon /></IconButton></Tooltip>
             <Tooltip title="Notifications"><IconButton color="inherit"><Badge variant="dot" color="primary"><NotificationsNoneRoundedIcon /></Badge></IconButton></Tooltip>
             <Stack direction="row" spacing={1} alignItems="center" sx={{ ml: 1 }}><Avatar sx={{ width: 34, height: 34, bgcolor: 'primary.main', color: 'primary.contrastText', fontSize: 13, fontWeight: 700 }}>{initials}</Avatar><Typography fontWeight={600} fontSize={14} sx={{ display: { xs: 'none', md: 'block' }, maxWidth: 130 }} noWrap>{displayName}</Typography></Stack>
