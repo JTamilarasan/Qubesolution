@@ -23,7 +23,7 @@ function AuthLayout({ children }) {
               <BrandMark />
               <Box sx={{ minWidth: 0 }}>
                 <Typography fontSize={19} fontWeight={700} lineHeight={1.15}>Excelacom</Typography>
-                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,.62)', letterSpacing: '.015em', fontSize: { xs: 10, sm: 11 } }}>Workforce Intelligence &amp; Operations</Typography>
+                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,.62)', letterSpacing: '.015em', fontSize: { xs: 10, sm: 11 } }}>Workforce Operations</Typography>
               </Box>
             </Stack>
 

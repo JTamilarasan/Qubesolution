@@ -43,7 +43,7 @@ function Brand({ compact = false }) {
   return (
     <Stack direction="row" spacing={1.25} alignItems="center" sx={{ minWidth: 0 }}>
       <Box component="img" src="/excelacom-mark.svg" alt="Excelacom" sx={{ width: 42, height: 40, objectFit: 'contain', flex: '0 0 auto', bgcolor: '#FFFFFF', borderRadius: 1.25, p: .5 }} />
-      {!compact && <Box sx={{ minWidth: 0 }}><Typography sx={{ color: '#FFFFFF', fontWeight: 700, fontSize: 18, lineHeight: 1.2 }}>Excelacom</Typography><Typography sx={{ color: 'rgba(255,255,255,.64)', fontSize: 10.5, fontWeight: 400, lineHeight: 1.3, mt: .25 }} noWrap>Workforce Intelligence &amp; Operations</Typography></Box>}
+      {!compact && <Box sx={{ minWidth: 0 }}><Typography sx={{ color: '#FFFFFF', fontWeight: 700, fontSize: 18, lineHeight: 1.2 }}>Excelacom</Typography><Typography sx={{ color: 'rgba(255,255,255,.64)', fontSize: 10.5, fontWeight: 400, lineHeight: 1.3, mt: .25 }} noWrap>Workforce Operations</Typography></Box>}
     </Stack>
   )
 }
@@ -53,7 +53,7 @@ function Navigation({ compact, onSelect, onLogout, loggingOut }) {
     <Stack sx={{ height: '100%' }}>
       <Box sx={{ height: 76, px: compact ? 2 : 2.25, display: 'flex', alignItems: 'center' }}><Brand compact={compact} /></Box>
       <Divider sx={{ borderColor: 'rgba(255,255,255,.08)' }} />
-      <Box sx={{ flex: 1, overflowY: 'auto', py: 1.25 }}>
+      <Box sx={{ flex: 1, overflowY: 'auto', py: 1.25, scrollbarWidth: 'none', msOverflowStyle: 'none', '&::-webkit-scrollbar': { display: 'none' } }}>
         {navigation.map((group) => (
           <Box key={group.section} sx={{ mb: 1 }}>
             {!compact && <Typography sx={{ px: 2.25, py: .9, color: 'rgba(255,255,255,.38)', fontSize: 10, fontWeight: 700, letterSpacing: '.12em' }}>{group.section}</Typography>}
