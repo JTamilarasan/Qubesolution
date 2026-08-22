@@ -1,0 +1,3 @@
+import OperationPage from '../../components/common/OperationPage'
+const columns=[{field:'employeeId',label:'Employee ID'},{field:'employeeName',label:'Employee Name'},{field:'workingDays',label:'Working Days'},{field:'presentDays',label:'Present'},{field:'leaveDays',label:'Leave'},{field:'lop',label:'LOP'},{field:'status',label:'Status'}]
+export default function AttendancePage(){return <OperationPage title="Attendance" description="Review workforce attendance and monthly availability." metrics={['Working Days','Present','Leave','LOP']} filters={['Year','Month','Project','Employee']} columns={columns} collectionName="attendance" emptyTitle="No attendance records" emptyDescription="Upload or create attendance records to review monthly workforce availability."/>}
