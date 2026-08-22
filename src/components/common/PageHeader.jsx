@@ -8,9 +8,9 @@ function PageHeader({ section, title, description, primaryLabel, primaryIcon, on
         <Typography component="h1" sx={{ fontSize: { xs: 26, md: 28 }, fontWeight: 700, lineHeight: 1.25 }}>{title}</Typography>
         <Typography color="text.secondary" sx={{ mt: .5, fontSize: 14 }}>{description}</Typography>
       </Box>
-      {(primaryLabel || secondaryLabel) && <Stack direction="row" gap={1.25} flexWrap="wrap">
-        {secondaryLabel && <Button variant="outlined" color="secondary" onClick={onSecondary}>{secondaryLabel}</Button>}
-        {primaryLabel && <Button variant="contained" startIcon={primaryIcon} onClick={onPrimary}>{primaryLabel}</Button>}
+      {(primaryLabel || secondaryLabel) && <Stack direction="row" alignItems="center" justifyContent={{ xs: 'flex-start', sm: 'flex-end' }} gap={1.25} flexWrap="wrap" sx={{ flex: '0 0 auto', ml: { xs: 0, sm: 'auto' }, alignSelf: { xs: 'stretch', sm: 'flex-start' } }}>
+        {secondaryLabel && <Button variant="outlined" color="secondary" onClick={onSecondary} sx={{ flex: '0 0 auto' }}>{secondaryLabel}</Button>}
+        {primaryLabel && <Button variant="contained" startIcon={primaryIcon} onClick={onPrimary} sx={{ flex: '0 0 auto' }}>{primaryLabel}</Button>}
       </Stack>}
     </Stack>
   )

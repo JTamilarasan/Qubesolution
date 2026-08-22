@@ -36,9 +36,10 @@ export const appTheme = createTheme({
     MuiButton: {
       styleOverrides: {
         root: {
-          minHeight: 40, borderRadius: 8, paddingLeft: 16, paddingRight: 16,
+          height: 40, minHeight: 40, borderRadius: 8, padding: '0 16px',
           boxShadow: 'none', fontSize: 14, fontWeight: 600, lineHeight: 1.25, textTransform: 'none',
           '& .MuiButton-startIcon': { marginRight: 7, '& > :nth-of-type(1)': { fontSize: 18 } },
+          '@media (max-width:600px)': { height: 44, minHeight: 44 },
         },
         containedPrimary: {
           '&:hover': { backgroundColor: '#D97706', boxShadow: 'none' },

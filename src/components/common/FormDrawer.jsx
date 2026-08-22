@@ -19,7 +19,7 @@ function FormDrawer({ open, onClose, title, subtitle, children, onSubmit, saving
           <Box sx={{ width: 3, minHeight: 40, borderRadius: 999, bgcolor: 'primary.main', flex: '0 0 auto' }} />
           <Box sx={{ minWidth: 0 }}><Typography sx={{ fontSize: 20, lineHeight: 1.25, fontWeight: 700, color: 'secondary.main' }}>{title}</Typography>{subtitle && <Typography sx={{ mt: '3px', fontSize: 13, color: 'text.secondary', lineHeight: 1.4 }}>{subtitle}</Typography>}</Box>
         </Stack>
-        <IconButton disabled={saving} onClick={onClose} aria-label="Close dialog" sx={{ width: 36, height: 36, flex: '0 0 auto', color: 'text.secondary', '&:hover': { bgcolor: '#F3F4F6' } }}><CloseRoundedIcon sx={{ fontSize: 20 }} /></IconButton>
+        <IconButton disabled={saving} onClick={onClose} aria-label="Close dialog" sx={{ width: 36, height: 36, flex: '0 0 auto', ml: 'auto', alignSelf: 'flex-start', color: 'text.secondary', '&:hover': { bgcolor: '#F3F4F6' } }}><CloseRoundedIcon sx={{ fontSize: 20 }} /></IconButton>
       </Stack>
       <Divider />
       <Box sx={{ p: '22px', flex: 1, minHeight: 0, overflowY: 'auto' }}>{children}</Box>
