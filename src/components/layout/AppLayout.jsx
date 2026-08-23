@@ -38,9 +38,9 @@ const navigation = [
     { label: 'Project Category', path: '/masters/project-categories', icon: CategoryRoundedIcon }, { label: 'Project Master', path: '/masters/projects', icon: AccountTreeRoundedIcon }, { label: 'Sub Project Master', path: '/masters/sub-projects', icon: BadgeRoundedIcon }, { label: 'Employee Master', path: '/masters/employees', icon: PeopleAltRoundedIcon }, { label: 'Forecast Master', path: '/masters/forecast', icon: InsightsRoundedIcon }, { label: 'Ledger Category', path: '/masters/ledger-categories', icon: AccountBalanceRoundedIcon }, { label: 'Ledger Master', path: '/masters/ledgers', icon: MenuBookRoundedIcon },
   ] },
   { section: 'IMPORTS', items: [
-    { label: 'Employee Import', path: '/imports/employees', icon: UploadFileRoundedIcon }, { label: 'Payroll Import', path: '/imports/payroll', icon: ReceiptLongRoundedIcon }, { label: 'Actual Work Hours', path: '/imports/actual-work-hours', icon: AccessTimeRoundedIcon },
+    { label: 'Employee Import', path: '/imports/employees', icon: UploadFileRoundedIcon }, { label: 'Payroll Import', path: '/imports/payroll', icon: ReceiptLongRoundedIcon }, { label: 'Actual Work Hours', path: '/imports/actual-work-hours', icon: AccessTimeRoundedIcon }, { label: 'Other Entries Upload', path: '/imports/other-entries', icon: UploadFileRoundedIcon },
   ] },
-  { section: 'REPORTS', items: [{ label: 'Actual Hours Report', path: '/reports/actual-work-hours', icon: QueryStatsRoundedIcon }] },
+  { section: 'REPORTS', items: [{ label: 'Actual Hours Report', path: '/reports/actual-work-hours', icon: QueryStatsRoundedIcon }, { label: 'Other Entries Report', path: '/reports/other-entries', icon: QueryStatsRoundedIcon }] },
 ]
 
 function Brand({ compact = false }) {

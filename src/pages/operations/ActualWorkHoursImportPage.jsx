@@ -6,6 +6,7 @@ import PageHeader from '../../components/common/PageHeader'
 import PaginatedTable from '../../components/common/PaginatedTable'
 import { useCollection } from '../../hooks/useCollection'
 import { createRecords } from '../../services/firestoreService'
+import { formatMonth } from '../../utils/formatters'
 
 const clean = (value) => String(value ?? '').trim()
 const fromColumn = (row, names) => { const key = Object.keys(row).find((column) => names.some((name) => column.trim().toLowerCase() === name.toLowerCase())); return key ? row[key] : '' }
@@ -13,7 +14,7 @@ const monthValue = (value) => {
   if (typeof value === 'number') { const parsed = XLSX.SSF.parse_date_code(value); if (parsed) return `${parsed.y}-${String(parsed.m).padStart(2, '0')}-01` }
   const text = clean(value), short = text.match(/^([A-Za-z]{3,9})[- /](\d{2}|\d{4})$/)
   if (short) { const month = new Date(`${short[1]} 1, 2000`).getMonth(); const year = Number(short[2]) < 100 ? 2000 + Number(short[2]) : Number(short[2]); if (month >= 0) return `${year}-${String(month + 1).padStart(2, '0')}-01` }
-  const date = new Date(value); return Number.isNaN(date.getTime()) ? '' : `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-01`
+  const date = new Date(value); if (Number.isNaN(date.getTime())) return ''; const adjusted = new Date(date.getTime() + (12 * 60 * 60 * 1000)); return `${adjusted.getFullYear()}-${String(adjusted.getMonth() + 1).padStart(2, '0')}-01`
 }
 
 const nextVoucherNumber = (records) => {
@@ -52,7 +53,7 @@ function ActualWorkHoursImportPage() {
       if (employee && clean(employee.subProjectId).toLowerCase() !== subProjectId.toLowerCase()) errors.push('Sub Project ID does not match Employee Master.')
       const monthDate = monthValue(month), actualHours = Number(actualHoursRaw)
       if (!monthDate) errors.push('Month is invalid.'); if (actualHoursRaw === '' || !Number.isFinite(actualHours) || actualHours < 0) errors.push('Actual HRS must be 0 or greater.')
-      return { rowNumber: index + 2, employeeId, employeeName, projectName, projectId, subProjectId, month: clean(month), monthDate, actualHours, errors, isValid: !errors.length }
+      return { rowNumber: index + 2, employeeId, employeeName, projectName, projectId, subProjectId, month: formatMonth(month), monthDate, actualHours, errors, isValid: !errors.length }
     })
     setRows(checked); setValidated(true); setError('')
   }
