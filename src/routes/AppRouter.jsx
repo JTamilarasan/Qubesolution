@@ -19,6 +19,7 @@ import ActualWorkHoursImportPage from '../pages/operations/ActualWorkHoursImport
 import ActualWorkHoursReportPage from '../pages/reports/ActualWorkHoursReportPage'
 import OtherEntriesImportPage from '../pages/operations/OtherEntriesImportPage'
 import OtherEntriesReportPage from '../pages/reports/OtherEntriesReportPage'
+import EmployeeMasterReportPage from '../pages/reports/EmployeeMasterReportPage'
 import ProtectedRoute from './ProtectedRoute'
 import PublicRoute from './PublicRoute'
 
@@ -45,6 +46,7 @@ function AppRouter() {
       <Route path="/imports/other-entries" element={<OtherEntriesImportPage />} />
       <Route path="/reports/actual-work-hours" element={<ActualWorkHoursReportPage />} />
       <Route path="/reports/other-entries" element={<OtherEntriesReportPage />} />
+      <Route path="/reports/employee-master" element={<EmployeeMasterReportPage />} />
     </Route>
     <Route path="*" element={<Navigate to="/dashboard" replace />} />
   </Routes></BrowserRouter>

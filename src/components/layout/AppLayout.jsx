@@ -8,14 +8,12 @@ import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded'
 import QueryStatsRoundedIcon from '@mui/icons-material/QueryStatsRounded'
 import ChevronLeftRoundedIcon from '@mui/icons-material/ChevronLeftRounded'
 import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded'
-import EventAvailableRoundedIcon from '@mui/icons-material/EventAvailableRounded'
 import HelpOutlineRoundedIcon from '@mui/icons-material/HelpOutlineRounded'
 import InsightsRoundedIcon from '@mui/icons-material/InsightsRounded'
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded'
 import NotificationsNoneRoundedIcon from '@mui/icons-material/NotificationsNoneRounded'
 import PeopleAltRoundedIcon from '@mui/icons-material/PeopleAltRounded'
-import ReceiptLongRoundedIcon from '@mui/icons-material/ReceiptLongRounded'
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded'
 import UploadFileRoundedIcon from '@mui/icons-material/UploadFileRounded'
 import {
@@ -31,16 +29,21 @@ const expandedWidth = 256
 const collapsedWidth = 72
 const navigation = [
   { section: 'OVERVIEW', items: [{ label: 'Dashboard', path: '/dashboard', icon: DashboardRoundedIcon }] },
-  { section: 'WORKFORCE', items: [
-    { label: 'Attendance', path: '/attendance', icon: EventAvailableRoundedIcon }, { label: 'Labour Hours', path: '/labour-hours', icon: AccessTimeRoundedIcon },
-  ] },
+  // Future workforce menus are intentionally hidden from the sidebar.
+  // { section: 'WORKFORCE', items: [
+  //   { label: 'Attendance', path: '/attendance', icon: EventAvailableRoundedIcon },
+  //   { label: 'Labour Hours', path: '/labour-hours', icon: AccessTimeRoundedIcon },
+  // ] },
   { section: 'MASTERS', items: [
     { label: 'Project Category', path: '/masters/project-categories', icon: CategoryRoundedIcon }, { label: 'Project Master', path: '/masters/projects', icon: AccountTreeRoundedIcon }, { label: 'Sub Project Master', path: '/masters/sub-projects', icon: BadgeRoundedIcon }, { label: 'Employee Master', path: '/masters/employees', icon: PeopleAltRoundedIcon }, { label: 'Forecast Master', path: '/masters/forecast', icon: InsightsRoundedIcon }, { label: 'Ledger Category', path: '/masters/ledger-categories', icon: AccountBalanceRoundedIcon }, { label: 'Ledger Master', path: '/masters/ledgers', icon: MenuBookRoundedIcon },
   ] },
   { section: 'IMPORTS', items: [
-    { label: 'Employee Import', path: '/imports/employees', icon: UploadFileRoundedIcon }, { label: 'Payroll Import', path: '/imports/payroll', icon: ReceiptLongRoundedIcon }, { label: 'Actual Work Hours', path: '/imports/actual-work-hours', icon: AccessTimeRoundedIcon }, { label: 'Other Entries Upload', path: '/imports/other-entries', icon: UploadFileRoundedIcon },
+    // Future imports: Employee Import and Payroll Import are intentionally hidden from the sidebar.
+    // { label: 'Employee Import', path: '/imports/employees', icon: UploadFileRoundedIcon },
+    // { label: 'Payroll Import', path: '/imports/payroll', icon: ReceiptLongRoundedIcon },
+    { label: 'Actual Work Hours', path: '/imports/actual-work-hours', icon: AccessTimeRoundedIcon }, { label: 'Other Entries Upload', path: '/imports/other-entries', icon: UploadFileRoundedIcon },
   ] },
-  { section: 'REPORTS', items: [{ label: 'Actual Hours Report', path: '/reports/actual-work-hours', icon: QueryStatsRoundedIcon }, { label: 'Other Entries Report', path: '/reports/other-entries', icon: QueryStatsRoundedIcon }] },
+  { section: 'REPORTS', items: [{ label: 'Employee Master Report', path: '/reports/employee-master', icon: PeopleAltRoundedIcon }, { label: 'Actual Hours Report', path: '/reports/actual-work-hours', icon: QueryStatsRoundedIcon }, { label: 'Other Entries Report', path: '/reports/other-entries', icon: QueryStatsRoundedIcon }] },
 ]
 
 function Brand({ compact = false }) {
