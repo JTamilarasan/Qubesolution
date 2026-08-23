@@ -1,31 +1,78 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
+import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded'
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded'
-import { Alert, Card, IconButton, Menu, MenuItem, Snackbar, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from '@mui/material'
+import { Alert, Box, Button, Card, Divider, IconButton, Menu, MenuItem, Snackbar, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from '@mui/material'
 import ConfirmDialog from '../../components/common/ConfirmDialog'
 import ContentState from '../../components/common/ContentState'
 import FormDrawer from '../../components/common/FormDrawer'
-import FormSection from '../../components/common/FormSection'
 import PageHeader from '../../components/common/PageHeader'
 import PaginatedTable from '../../components/common/PaginatedTable'
 import StatusChip from '../../components/common/StatusChip'
 import { useCollection } from '../../hooks/useCollection'
-import { createRecord, deleteRecord, updateRecord } from '../../services/firestoreService'
+import { createRecords, deleteRecord, updateRecord } from '../../services/firestoreService'
 
-const months = ['January','February','March','April','May','June','July','August','September','October','November','December']
-const blank = { year: new Date().getFullYear(), month: new Date().getMonth() + 1, hours: '', actualHours: '', status: 'active' }
+const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+const emptyYear = () => ({ year: '', hours: Array(12).fill(0) })
 
 function ForecastMasterPage() {
   const forecasts = useCollection('forecastMasters')
-  const [form, setForm] = useState(blank), [editing, setEditing] = useState(null), [open, setOpen] = useState(false), [saving, setSaving] = useState(false), [error, setError] = useState(''), [notice, setNotice] = useState(''), [anchor, setAnchor] = useState(null), [selected, setSelected] = useState(null)
-  const start = (item = null) => { setEditing(item); setForm(item ? { year: item.year, month: item.month, hours: item.hours ?? item.forecastHours, actualHours: item.actualHours || '', status: item.status || 'active' } : blank); setError(''); setOpen(true); setAnchor(null); setSelected(null) }
-  const save = async (event) => { event.preventDefault(); const hours = Number(form.hours); if (!form.year || !form.month || !Number.isFinite(hours) || hours <= 0) return setError('Year, month and positive forecast hours are required.'); if (forecasts.data.some((item) => item.id !== editing?.id && Number(item.year) === Number(form.year) && Number(item.month) === Number(form.month))) return setError('A forecast already exists for this year and month.'); setSaving(true); try { const payload = { year: Number(form.year), month: Number(form.month), monthName: months[Number(form.month) - 1], hours, actualHours: Number(form.actualHours || 0), status: form.status }; if (editing) await updateRecord('forecastMasters', editing.id, payload); else await createRecord('forecastMasters', payload); setOpen(false); setNotice(editing ? 'Forecast updated.' : 'Forecast created.') } catch (requestError) { setError(requestError.message) } finally { setSaving(false) } }
-  const remove = async () => { try { await deleteRecord('forecastMasters', selected.id); setSelected(null); setNotice('Forecast deleted.') } catch (errorValue) { setNotice(errorValue.message) } }
-  return <Stack spacing={3}><PageHeader section="Masters / Forecast Master" title="Forecast Master" description="Maintain monthly forecast hours and compare forecast against actuals." primaryLabel="Add Forecast" primaryIcon={<AddRoundedIcon />} onPrimary={() => start()} />
-    <Card variant="outlined">{forecasts.loading || forecasts.error || !forecasts.data.length ? <ContentState loading={forecasts.loading} error={forecasts.error} title="No forecasts created yet" description="Add monthly forecast hours to begin utilization tracking." /> : <PaginatedTable columns={['Month','Forecast Hours','Actual Hours','Variance','Variance %','Status'].map((label) => ({ label })).concat({ label: 'Actions', align: 'right' })} rows={[...forecasts.data].sort((a,b) => a.year-b.year || a.month-b.month)} renderRow={(item) => { const fc = Number(item.hours ?? item.forecastHours ?? 0), ac = Number(item.actualHours || 0), variance = ac - fc; return <TableRow hover key={item.id}><TableCell>{months[item.month - 1]} {item.year}</TableCell><TableCell sx={{ color: 'secondary.main', fontWeight: 650 }}>FC: {fc}</TableCell><TableCell sx={{ color: 'primary.dark', fontWeight: 650 }}>AC: {ac}</TableCell><TableCell>{variance}</TableCell><TableCell>{fc ? `${((variance / fc) * 100).toFixed(1)}%` : '0%'}</TableCell><TableCell><StatusChip status={item.status} /></TableCell><TableCell align="right"><IconButton onClick={(event) => { setAnchor(event.currentTarget); setSelected(item) }}><MoreVertRoundedIcon /></IconButton></TableCell></TableRow> }} />}</Card>
-    <Menu anchorEl={anchor} open={Boolean(anchor)} onClose={() => { setAnchor(null); setSelected(null) }}><MenuItem onClick={() => start(selected)}>Edit</MenuItem><MenuItem sx={{ color: 'error.main' }} onClick={() => setAnchor(null)}>Delete</MenuItem></Menu>
-    <FormDrawer open={open} onClose={() => setOpen(false)} title={editing ? 'Edit Forecast' : 'New Forecast'} subtitle="Monthly forecast information" onSubmit={save} saving={saving} submitLabel={editing ? 'Update Forecast' : 'Create Forecast'} width={560}>{error && <Alert severity="error" variant="outlined" sx={{ mb: 2.5 }}>{error}</Alert>}<FormSection title="Forecast Information"><TextField select label="Year" value={form.year} onChange={(event) => setForm({ ...form, year: event.target.value })}>{Array.from({ length: 8 }, (_, index) => new Date().getFullYear() - 2 + index).map((year) => <MenuItem key={year} value={year}>{year}</MenuItem>)}</TextField><TextField select label="Month" value={form.month} onChange={(event) => setForm({ ...form, month: event.target.value })}>{months.map((month, index) => <MenuItem key={month} value={index + 1}>{month}</MenuItem>)}</TextField><TextField type="number" label="Forecast Hours" value={form.hours} onChange={(event) => setForm({ ...form, hours: event.target.value })} slotProps={{ htmlInput: { min: 1 } }} /><TextField type="number" label="Actual Hours" value={form.actualHours} onChange={(event) => setForm({ ...form, actualHours: event.target.value })} slotProps={{ htmlInput: { min: 0 } }} /><TextField select label="Status" value={form.status} onChange={(event) => setForm({ ...form, status: event.target.value })}><MenuItem value="active">Active</MenuItem><MenuItem value="inactive">Inactive</MenuItem></TextField></FormSection></FormDrawer>
-    <ConfirmDialog open={Boolean(selected && !anchor)} title="Delete forecast?" description="Delete this monthly forecast record?" onCancel={() => setSelected(null)} onConfirm={remove} /><Snackbar open={Boolean(notice)} autoHideDuration={5000} onClose={() => setNotice('')}><Alert severity="info">{notice}</Alert></Snackbar>
+  const [blocks, setBlocks] = useState([emptyYear()]), [editingYear, setEditingYear] = useState(null), [open, setOpen] = useState(false)
+  const [saving, setSaving] = useState(false), [error, setError] = useState(''), [notice, setNotice] = useState(''), [anchor, setAnchor] = useState(null), [selected, setSelected] = useState(null)
+  const currentYear = new Date().getFullYear()
+  const yearOptions = Array.from({ length: 21 }, (_, index) => currentYear + index)
+  const groups = useMemo(() => {
+    const byYear = new Map()
+    forecasts.data.forEach((record) => {
+      const year = Number(record.year)
+      if (!byYear.has(year)) byYear.set(year, { year, records: [], status: 'Active' })
+      byYear.get(year).records.push(record)
+    })
+    return [...byYear.values()].map((group) => ({ ...group, records: group.records.sort((a, b) => Number(a.month) - Number(b.month)), totalHours: group.records.reduce((sum, item) => sum + Number(item.hours ?? item.forecastHours ?? 0), 0), status: group.records.some((item) => String(item.status).toLowerCase() === 'inactive') ? 'Inactive' : 'Active' })).sort((a, b) => a.year - b.year)
+  }, [forecasts.data])
+  const usedYears = new Set(groups.map((group) => group.year))
+
+  const startCreate = () => { setEditingYear(null); setBlocks([emptyYear()]); setError(''); setOpen(true) }
+  const startEdit = (group) => {
+    const hours = Array(12).fill(0)
+    group.records.forEach((item) => { hours[Number(item.month) - 1] = Number(item.hours ?? item.forecastHours ?? 0) })
+    setEditingYear(group.year); setBlocks([{ year: group.year, hours }]); setError(''); setOpen(true); setAnchor(null); setSelected(null)
+  }
+  const changeYear = (index, year) => setBlocks((value) => value.map((block, blockIndex) => blockIndex === index ? { ...block, year: Number(year) } : block))
+  const changeHours = (blockIndex, monthIndex, hours) => setBlocks((value) => value.map((block, index) => index === blockIndex ? { ...block, hours: block.hours.map((item, itemIndex) => itemIndex === monthIndex ? hours : item) } : block))
+  const addYear = () => { if (blocks.some((block) => !block.year)) return setError('Select the current Year before adding another Year.'); setError(''); setBlocks((value) => [...value, emptyYear()]) }
+  const removeYear = (index) => setBlocks((value) => value.filter((_, blockIndex) => blockIndex !== index))
+
+  const save = async (event) => {
+    event.preventDefault(); setError('')
+    if (blocks.some((block) => !block.year)) return setError('Year is required.')
+    if (blocks.some((block) => block.hours.some((hours) => !Number.isFinite(Number(hours)) || Number(hours) < 0))) return setError('Forecast Hours must be 0 or greater.')
+    setSaving(true)
+    try {
+      for (const block of blocks) {
+        const existing = forecasts.data.filter((item) => Number(item.year) === Number(block.year))
+        const toCreate = []
+        for (let monthIndex = 0; monthIndex < 12; monthIndex += 1) {
+          const payload = { year: Number(block.year), month: monthIndex + 1, monthName: months[monthIndex], hours: Number(block.hours[monthIndex] || 0), status: 'Active' }
+          const record = existing.find((item) => Number(item.month) === monthIndex + 1)
+          if (record) await updateRecord('forecastMasters', record.id, { ...payload, actualHours: Number(record.actualHours || 0), status: record.status || 'Active' })
+          else toCreate.push({ ...payload, actualHours: 0 })
+        }
+        if (toCreate.length) await createRecords('forecastMasters', toCreate)
+      }
+      setOpen(false); setNotice(editingYear ? 'Forecast year updated.' : 'Forecast years created.')
+    } catch (requestError) { setError(requestError.message) } finally { setSaving(false) }
+  }
+  const remove = async () => { setSaving(true); try { await Promise.all(selected.records.map((item) => deleteRecord('forecastMasters', item.id))); setSelected(null); setNotice('Forecast year deleted.') } catch (requestError) { setNotice(requestError.message) } finally { setSaving(false) } }
+
+  return <Stack spacing={3}><PageHeader section="Masters / Forecast Master" title="Forecast Master" description="Maintain forecast hours for every month in a selected year." primaryLabel="Add Forecast" primaryIcon={<AddRoundedIcon />} onPrimary={startCreate} />
+    <Card variant="outlined">{forecasts.loading || forecasts.error || !groups.length ? <ContentState loading={forecasts.loading} error={forecasts.error} title="No forecasts created yet" description="Add a year and enter monthly forecast hours." /> : <PaginatedTable columns={[{ label: 'Year' }, { label: 'Months' }, { label: 'Total Forecast Hours' }, { label: 'Status' }, { label: 'Actions', align: 'right' }]} rows={groups} renderRow={(group) => <TableRow hover key={group.year}><TableCell sx={{ fontWeight: 700 }}>{group.year}</TableCell><TableCell>{group.records.length} / 12</TableCell><TableCell>{group.totalHours}</TableCell><TableCell><StatusChip status={group.status} /></TableCell><TableCell align="right"><IconButton onClick={(event) => { setAnchor(event.currentTarget); setSelected(group) }}><MoreVertRoundedIcon /></IconButton></TableCell></TableRow>} />}</Card>
+    <Menu anchorEl={anchor} open={Boolean(anchor)} onClose={() => { setAnchor(null); setSelected(null) }}><MenuItem onClick={() => startEdit(selected)}>Edit Year</MenuItem><MenuItem sx={{ color: 'error.main' }} onClick={() => setAnchor(null)}>Delete Year</MenuItem></Menu>
+    <FormDrawer open={open} onClose={() => setOpen(false)} title={editingYear ? `Edit Forecast ${editingYear}` : 'New Forecast'} subtitle="Enter monthly forecast hours by year" onSubmit={save} saving={saving} submitLabel={editingYear ? 'Update Forecast' : 'Create Forecast'} width={800} mobileFullScreen>{error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}<Stack spacing={3}>{blocks.map((block, blockIndex) => <Box key={`${block.year}-${blockIndex}`}>{blockIndex > 0 && <Divider sx={{ mb: 3 }} />}<Stack direction="row" alignItems="center" sx={{ mb: 2 }}><TextField select required label="Year" value={block.year} disabled={Boolean(editingYear)} onChange={(event) => changeYear(blockIndex, event.target.value)} sx={{ width: { xs: '100%', sm: 220 } }}><MenuItem value="">Select Year</MenuItem>{yearOptions.filter((year) => year === block.year || (!usedYears.has(year) && !blocks.some((item, index) => index !== blockIndex && Number(item.year) === year))).map((year) => <MenuItem key={year} value={year}>{year}</MenuItem>)}</TextField>{blocks.length > 1 && <IconButton type="button" aria-label="Remove year" onClick={() => removeYear(blockIndex)} sx={{ ml: 'auto', color: 'error.main' }}><DeleteOutlineRoundedIcon /></IconButton>}</Stack>
+      {block.year && <TableContainer sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2 }}><Table size="small"><TableHead><TableRow><TableCell sx={{ width: 90 }}>Year</TableCell><TableCell>Forecast Month</TableCell><TableCell sx={{ width: { xs: 130, sm: 190 } }}>Hours</TableCell></TableRow></TableHead><TableBody>{months.map((month, monthIndex) => <TableRow key={month}><TableCell>{monthIndex === 0 ? block.year : ''}</TableCell><TableCell>{month}</TableCell><TableCell><TextField type="number" size="small" value={block.hours[monthIndex]} onChange={(event) => changeHours(blockIndex, monthIndex, event.target.value === '' ? '' : Number(event.target.value))} slotProps={{ htmlInput: { min: 0, step: '0.01', 'aria-label': `${month} forecast hours` } }} sx={{ width: '100%', '& .MuiOutlinedInput-root': { minHeight: 38, height: 38 }, '& input': { textAlign: 'right', py: .75 } }} /></TableCell></TableRow>)}</TableBody></Table></TableContainer>}</Box>)}
+      {!editingYear && <Button type="button" variant="outlined" startIcon={<AddRoundedIcon />} onClick={addYear} sx={{ alignSelf: 'flex-start' }}>Add Year</Button>}
+    </Stack></FormDrawer>
+    <ConfirmDialog open={Boolean(selected && !anchor)} title="Delete Forecast Year?" description={`Delete all monthly forecast records for ${selected?.year || 'this year'}?`} onCancel={() => setSelected(null)} onConfirm={remove} busy={saving} /><Snackbar open={Boolean(notice)} autoHideDuration={5000} onClose={() => setNotice('')}><Alert severity="info">{notice}</Alert></Snackbar>
   </Stack>
 }
 

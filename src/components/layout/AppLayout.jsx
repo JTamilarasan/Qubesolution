@@ -3,6 +3,9 @@ import AccessTimeRoundedIcon from '@mui/icons-material/AccessTimeRounded'
 import AccountTreeRoundedIcon from '@mui/icons-material/AccountTreeRounded'
 import BadgeRoundedIcon from '@mui/icons-material/BadgeRounded'
 import CategoryRoundedIcon from '@mui/icons-material/CategoryRounded'
+import AccountBalanceRoundedIcon from '@mui/icons-material/AccountBalanceRounded'
+import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded'
+import QueryStatsRoundedIcon from '@mui/icons-material/QueryStatsRounded'
 import ChevronLeftRoundedIcon from '@mui/icons-material/ChevronLeftRounded'
 import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded'
 import EventAvailableRoundedIcon from '@mui/icons-material/EventAvailableRounded'
@@ -32,11 +35,12 @@ const navigation = [
     { label: 'Attendance', path: '/attendance', icon: EventAvailableRoundedIcon }, { label: 'Labour Hours', path: '/labour-hours', icon: AccessTimeRoundedIcon },
   ] },
   { section: 'MASTERS', items: [
-    { label: 'Project Category', path: '/masters/project-categories', icon: CategoryRoundedIcon }, { label: 'Project Master', path: '/masters/projects', icon: AccountTreeRoundedIcon }, { label: 'Sub Project Master', path: '/masters/sub-projects', icon: BadgeRoundedIcon }, { label: 'Employee Master', path: '/masters/employees', icon: PeopleAltRoundedIcon }, { label: 'Forecast Master', path: '/masters/forecast', icon: InsightsRoundedIcon },
+    { label: 'Project Category', path: '/masters/project-categories', icon: CategoryRoundedIcon }, { label: 'Project Master', path: '/masters/projects', icon: AccountTreeRoundedIcon }, { label: 'Sub Project Master', path: '/masters/sub-projects', icon: BadgeRoundedIcon }, { label: 'Employee Master', path: '/masters/employees', icon: PeopleAltRoundedIcon }, { label: 'Forecast Master', path: '/masters/forecast', icon: InsightsRoundedIcon }, { label: 'Ledger Category', path: '/masters/ledger-categories', icon: AccountBalanceRoundedIcon }, { label: 'Ledger Master', path: '/masters/ledgers', icon: MenuBookRoundedIcon },
   ] },
   { section: 'IMPORTS', items: [
-    { label: 'Employee Import', path: '/imports/employees', icon: UploadFileRoundedIcon }, { label: 'Payroll Import', path: '/imports/payroll', icon: ReceiptLongRoundedIcon },
+    { label: 'Employee Import', path: '/imports/employees', icon: UploadFileRoundedIcon }, { label: 'Payroll Import', path: '/imports/payroll', icon: ReceiptLongRoundedIcon }, { label: 'Actual Work Hours', path: '/imports/actual-work-hours', icon: AccessTimeRoundedIcon },
   ] },
+  { section: 'REPORTS', items: [{ label: 'Actual Hours Report', path: '/reports/actual-work-hours', icon: QueryStatsRoundedIcon }] },
 ]
 
 function Brand({ compact = false }) {
@@ -97,7 +101,7 @@ function AppLayout() {
             <IconButton color="inherit" edge="start" onClick={() => setMobileOpen(true)} sx={{ display: { lg: 'none' }, mr: 1 }} aria-label="Open navigation"><MenuRoundedIcon /></IconButton>
             <IconButton onClick={() => setCollapsed((value) => !value)} sx={{ display: { xs: 'none', lg: 'inline-flex' }, mr: 1 }} aria-label="Toggle sidebar"><ChevronLeftRoundedIcon sx={{ transform: collapsed ? 'rotate(180deg)' : 'none' }} /></IconButton>
             <Box sx={{ display: { xs: 'block', lg: 'none' }, flex: 1 }}><Brand /></Box>
-            <Box sx={{ display: { xs: 'none', lg: 'block' }, flex: 1 }}><Typography variant="caption" color="text.secondary">{current?.path.startsWith('/masters') ? 'Masters' : current?.path.startsWith('/imports') ? 'Imports' : 'Workforce'}</Typography><Typography fontWeight={700}>{current?.label || 'Dashboard'}</Typography></Box>
+            <Box sx={{ display: { xs: 'none', lg: 'block' }, flex: 1 }}><Typography variant="caption" color="text.secondary">{current?.path.startsWith('/masters') ? 'Masters' : current?.path.startsWith('/imports') ? 'Imports' : current?.path.startsWith('/reports') ? 'Reports' : 'Workforce'}</Typography><Typography fontWeight={700}>{current?.label || 'Dashboard'}</Typography></Box>
             <TextField size="small" placeholder="Search Excelacom…" sx={{ width: 240, display: { xs: 'none', md: 'block' }, mr: 1.5 }} slotProps={{ input: { startAdornment: <InputAdornment position="start"><SearchRoundedIcon fontSize="small" /></InputAdornment> } }} />
             <Tooltip title="Help"><IconButton color="inherit" sx={{ display: { xs: 'none', sm: 'inline-flex' } }}><HelpOutlineRoundedIcon /></IconButton></Tooltip>
             <Tooltip title="Notifications"><IconButton color="inherit"><Badge variant="dot" color="primary"><NotificationsNoneRoundedIcon /></Badge></IconButton></Tooltip>
