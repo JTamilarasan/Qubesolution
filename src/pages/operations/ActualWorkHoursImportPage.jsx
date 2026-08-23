@@ -17,6 +17,15 @@ const monthValue = (value) => {
   const date = new Date(value); if (Number.isNaN(date.getTime())) return ''; const adjusted = new Date(date.getTime() + (12 * 60 * 60 * 1000)); return `${adjusted.getFullYear()}-${String(adjusted.getMonth() + 1).padStart(2, '0')}-01`
 }
 
+const costForMonth = (employee, monthDate) => {
+  const monthKey = clean(monthDate).slice(0, 7)
+  const detail = employee?.perHourCostDetails
+    ?.filter((item) => clean(item.date).slice(0, 7) <= monthKey)
+    .sort((a, b) => clean(b.date).localeCompare(clean(a.date)))[0]
+  if (!detail || detail.perHourCost === '' || !Number.isFinite(Number(detail.perHourCost))) return null
+  return Number(detail.perHourCost)
+}
+
 const nextVoucherNumber = (records) => {
   const highestNumber = records.reduce((highest, record) => {
     const match = /^AWH-(\d{6})$/.exec(clean(record.voucherNo))
@@ -53,7 +62,10 @@ function ActualWorkHoursImportPage() {
       if (employee && clean(employee.subProjectId).toLowerCase() !== subProjectId.toLowerCase()) errors.push('Sub Project ID does not match Employee Master.')
       const monthDate = monthValue(month), actualHours = Number(actualHoursRaw)
       if (!monthDate) errors.push('Month is invalid.'); if (actualHoursRaw === '' || !Number.isFinite(actualHours) || actualHours < 0) errors.push('Actual HRS must be 0 or greater.')
-      return { rowNumber: index + 2, employeeId, employeeName, projectName, projectId, subProjectId, month: formatMonth(month), monthDate, actualHours, errors, isValid: !errors.length }
+      const perHourCost = monthDate ? costForMonth(employee, monthDate) : null
+      if (employee && monthDate && perHourCost === null) errors.push(`Per Hour Cost is not available on or before ${formatMonth(monthDate)} in Employee Master.`)
+      const actualHoursAmount = perHourCost === null || !Number.isFinite(actualHours) ? null : actualHours * perHourCost
+      return { rowNumber: index + 2, employeeId, employeeName, projectName, projectId, subProjectId, month: formatMonth(month), monthDate, actualHours, perHourCost, actualHoursAmount, errors, isValid: !errors.length }
     })
     setRows(checked); setValidated(true); setError('')
   }
@@ -68,7 +80,7 @@ function ActualWorkHoursImportPage() {
       {complete && <Alert severity="success">{valid.length} Actual Work Hours records imported successfully.</Alert>}
       {!complete && <Stack direction="row" justifyContent="flex-end" sx={{ mt: 2, gap: '12px' }}><Button variant="outlined" onClick={validate} disabled={!fileName || !ledgerId || !voucherDate}>Validate</Button><Button variant="contained" onClick={importRows} disabled={!validated || Boolean(invalid.length) || !valid.length || importing}>{importing ? 'Importing…' : 'Import'}</Button></Stack>}{importing && <LinearProgress sx={{ mt: 1 }} />}
     </CardContent></Card>
-    {validated && <Card variant="outlined"><Stack direction="row" sx={{ p: 2, gap: '8px' }}><Chip color="success" label={`Valid ${valid.length}`} /><Chip color={invalid.length ? 'error' : 'default'} label={`Invalid ${invalid.length}`} /></Stack><PaginatedTable minWidth={1100} columns={['Row','Emp ID','Name','Project Name','Proj ID','Sub-proj ID','Month','Actual HRS','Validation'].map((label) => ({ label }))} rows={rows} renderRow={(row) => <TableRow key={row.rowNumber}><TableCell>{row.rowNumber}</TableCell><TableCell>{row.employeeId}</TableCell><TableCell>{row.employeeName}</TableCell><TableCell>{row.projectName}</TableCell><TableCell>{row.projectId}</TableCell><TableCell>{row.subProjectId}</TableCell><TableCell>{row.month}</TableCell><TableCell>{row.actualHours}</TableCell><TableCell><Chip size="small" color={row.isValid ? 'success' : 'error'} label={row.isValid ? 'Valid' : row.errors.join(' ')} /></TableCell></TableRow>} /></Card>}
+    {validated && <Card variant="outlined"><Stack direction="row" sx={{ p: 2, gap: '8px' }}><Chip color="success" label={`Valid ${valid.length}`} /><Chip color={invalid.length ? 'error' : 'default'} label={`Invalid ${invalid.length}`} /></Stack><PaginatedTable minWidth={1250} columns={['Row','Emp ID','Name','Project Name','Proj ID','Sub-proj ID','Month','Actual HRS','Per Hour Cost','Actual Hours','Validation'].map((label) => ({ label }))} rows={rows} renderRow={(row) => <TableRow key={row.rowNumber}><TableCell>{row.rowNumber}</TableCell><TableCell>{row.employeeId}</TableCell><TableCell>{row.employeeName}</TableCell><TableCell>{row.projectName}</TableCell><TableCell>{row.projectId}</TableCell><TableCell>{row.subProjectId}</TableCell><TableCell>{row.month}</TableCell><TableCell>{row.actualHours}</TableCell><TableCell>{row.perHourCost ?? '-'}</TableCell><TableCell>{row.actualHoursAmount ?? '-'}</TableCell><TableCell><Chip size="small" color={row.isValid ? 'success' : 'error'} label={row.isValid ? 'Valid' : row.errors.join(' ')} /></TableCell></TableRow>} /></Card>}
   </Stack>
 }
 export default ActualWorkHoursImportPage
