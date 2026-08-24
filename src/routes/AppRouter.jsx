@@ -17,6 +17,8 @@ import LabourHoursPage from '../pages/operations/LabourHoursPage'
 import PayrollImportPage from '../pages/operations/PayrollImportPage'
 import ActualWorkHoursImportPage from '../pages/operations/ActualWorkHoursImportPage'
 import ActualWorkHoursReportPage from '../pages/reports/ActualWorkHoursReportPage'
+import ForecastEntriesImportPage from '../pages/operations/ForecastEntriesImportPage'
+import ForecastEntriesReportPage from '../pages/reports/ForecastEntriesReportPage'
 import OtherEntriesImportPage from '../pages/operations/OtherEntriesImportPage'
 import OtherEntriesReportPage from '../pages/reports/OtherEntriesReportPage'
 import EmployeeMasterReportPage from '../pages/reports/EmployeeMasterReportPage'
@@ -43,8 +45,10 @@ function AppRouter() {
       <Route path="/imports/employees" element={<EmployeeImportPage />} />
       <Route path="/imports/payroll" element={<PayrollImportPage />} />
       <Route path="/imports/actual-work-hours" element={<ActualWorkHoursImportPage />} />
+      <Route path="/imports/forecast-entries" element={<ForecastEntriesImportPage />} />
       <Route path="/imports/other-entries" element={<OtherEntriesImportPage />} />
       <Route path="/reports/actual-work-hours" element={<ActualWorkHoursReportPage />} />
+      <Route path="/reports/forecast-entries" element={<ForecastEntriesReportPage />} />
       <Route path="/reports/other-entries" element={<OtherEntriesReportPage />} />
       <Route path="/reports/employee-master" element={<EmployeeMasterReportPage />} />
     </Route>

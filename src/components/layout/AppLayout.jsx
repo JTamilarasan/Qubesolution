@@ -41,9 +41,9 @@ const navigation = [
     // Future imports: Employee Import and Payroll Import are intentionally hidden from the sidebar.
     // { label: 'Employee Import', path: '/imports/employees', icon: UploadFileRoundedIcon },
     // { label: 'Payroll Import', path: '/imports/payroll', icon: ReceiptLongRoundedIcon },
-    { label: 'Actual Work Hours', path: '/imports/actual-work-hours', icon: AccessTimeRoundedIcon }, { label: 'Other Entries Upload', path: '/imports/other-entries', icon: UploadFileRoundedIcon },
+    { label: 'Forecast Entries Upload', path: '/imports/forecast-entries', icon: UploadFileRoundedIcon }, { label: 'Actual Work Hours', path: '/imports/actual-work-hours', icon: AccessTimeRoundedIcon }, { label: 'Other Entries Upload', path: '/imports/other-entries', icon: UploadFileRoundedIcon },
   ] },
-  { section: 'REPORTS', items: [{ label: 'Employee Master Report', path: '/reports/employee-master', icon: PeopleAltRoundedIcon }, { label: 'Actual Hours Report', path: '/reports/actual-work-hours', icon: QueryStatsRoundedIcon }, { label: 'Other Entries Report', path: '/reports/other-entries', icon: QueryStatsRoundedIcon }] },
+  { section: 'REPORTS', items: [{ label: 'Employee Master Report', path: '/reports/employee-master', icon: PeopleAltRoundedIcon }, { label: 'Forecast Entries Report', path: '/reports/forecast-entries', icon: QueryStatsRoundedIcon }, { label: 'Actual Hours Report', path: '/reports/actual-work-hours', icon: QueryStatsRoundedIcon }, { label: 'Other Entries Report', path: '/reports/other-entries', icon: QueryStatsRoundedIcon }] },
 ]
 
 function Brand({ compact = false }) {
