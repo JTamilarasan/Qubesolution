@@ -43,7 +43,7 @@ function SignInPage() {
 
   return (
     <AuthLayout>
-      <AuthHeader title="Welcome back" description="Sign in to continue to Excelacom." />
+      <AuthHeader title="Welcome back" description="Sign in to continue to Excelocom." />
       <Stack component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 3.5 }}>
         <TextField
           fullWidth label="Work Email" name="email" type="email" autoComplete="email"
@@ -62,7 +62,7 @@ function SignInPage() {
           {submitting ? 'Signing in…' : 'Sign in'}
         </Button>
         <Stack direction="row" alignItems="center" justifyContent="center" gap={.75} flexWrap="wrap" sx={{ mt: 2.25 }}>
-          <Typography component="span" color="text.secondary" sx={{ fontSize: 14 }}>New to Excelacom?</Typography>
+          <Typography component="span" color="text.secondary" sx={{ fontSize: 14 }}>New to Excelocom?</Typography>
           <Link component={RouterLink} to="/signup" underline="none" sx={{ fontSize: 14, fontWeight: 600, color: 'primary.main', '&:hover': { color: 'primary.dark' } }}>Create account</Link>
         </Stack>
       </Stack>

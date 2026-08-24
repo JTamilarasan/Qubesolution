@@ -20,7 +20,7 @@ const detailFields = (employee) => [
   ['Roll On Date', formatDate(employee.rollOnDate)],
   ['Roll Off Date', formatDate(employee.rollOffDate)],
   ['Date of Joining', formatDate(employee.dateOfJoining)],
-  ['Excelacom Experience', employee.excelacomExperience ?? employee.experience ?? '—'],
+  ['Excelocom Experience', employee.excelacomExperience ?? employee.experience ?? '—'],
   ['Final Customer', employee.finalCustomer || '—'],
   ['CTC', employee.ctc ?? '—'],
 ]

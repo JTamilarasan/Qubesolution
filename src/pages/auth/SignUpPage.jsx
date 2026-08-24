@@ -47,7 +47,7 @@ function SignUpPage() {
 
   return (
     <AuthLayout>
-      <AuthHeader title="Create your Excelacom account" description="Set up your account to access workforce operations." />
+      <AuthHeader title="Create your Excelocom account" description="Set up your account to access workforce operations." />
       <Stack component="form" onSubmit={handleSubmit} noValidate spacing={2} sx={{ mt: 3.5 }}>
         <TextField
           fullWidth label="Full Name" name="fullName" autoComplete="name" value={values.fullName} onChange={updateValue}
