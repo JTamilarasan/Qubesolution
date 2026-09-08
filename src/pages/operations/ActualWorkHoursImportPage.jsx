@@ -55,7 +55,6 @@ function ActualWorkHoursImportPage() {
       const employeeId = clean(fromColumn(source, ['Emp ID', 'Employee ID', 'EMPID'])), employeeName = clean(fromColumn(source, ['Name', 'Emp Name', 'Employee Name'])), projectName = clean(fromColumn(source, ['Project Name', 'ProjectName'])), projectId = clean(fromColumn(source, ['Proj ID', 'Project ID', 'ProjectId'])), subProjectId = clean(fromColumn(source, ['Sub-proj ID', 'Sub Project ID', 'SubProjectId'])), month = fromColumn(source, ['Month']), actualHoursRaw = fromColumn(source, ['Actual HRS', 'Actual Hours']), errors = []
       if (!employeeId) errors.push('Emp ID is required.'); if (!employeeName) errors.push('Name is required.'); if (!projectName) errors.push('Project Name is required.'); if (!projectId) errors.push('Proj ID is required.'); if (!subProjectId) errors.push('Sub-proj ID is required.')
       const employee = employees.data.find((item) => clean(item.employeeId).toLowerCase() === employeeId.toLowerCase())
-      if (employeeId && !employee) errors.push('Employee ID does not exist in Employee Master.')
       const monthDate = monthValue(month), actualHours = Number(actualHoursRaw)
       if (!monthDate) errors.push('Month is invalid.'); if (actualHoursRaw === '' || !Number.isFinite(actualHours) || actualHours < 0) errors.push('Actual HRS must be 0 or greater.')
       const perHourCost = monthDate ? costForMonth(employee, monthDate) : null

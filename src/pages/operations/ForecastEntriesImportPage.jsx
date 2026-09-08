@@ -55,7 +55,6 @@ function ForecastEntriesImportPage() {
       const employeeId = clean(fromColumn(source, ['Emp ID', 'Employee ID', 'EMPID'])), employeeName = clean(fromColumn(source, ['Name', 'Emp Name', 'Employee Name'])), projectName = clean(fromColumn(source, ['Project Name', 'ProjectName'])), projectId = clean(fromColumn(source, ['Proj ID', 'Project ID', 'ProjectId'])), subProjectId = clean(fromColumn(source, ['Sub-proj ID', 'Sub Project ID', 'SubProjectId'])), month = fromColumn(source, ['Month']), forecastHoursRaw = fromColumn(source, ['Forecast HRS', 'Forecast Hours']), errors = []
       if (!employeeId) errors.push('Emp ID is required.'); if (!employeeName) errors.push('Name is required.'); if (!projectName) errors.push('Project Name is required.'); if (!projectId) errors.push('Proj ID is required.'); if (!subProjectId) errors.push('Sub-proj ID is required.')
       const employee = employees.data.find((item) => clean(item.employeeId).toLowerCase() === employeeId.toLowerCase())
-      if (employeeId && !employee) errors.push('Employee ID does not exist in Employee Master.')
       if (employee && clean(employee.employeeName).toLowerCase() !== employeeName.toLowerCase()) errors.push('Employee Name does not match Employee Master.')
       if (employee && clean(employee.projectName).toLowerCase() !== projectName.toLowerCase()) errors.push('Project Name does not match Employee Master.')
       if (employee && clean(employee.projectId).toLowerCase() !== projectId.toLowerCase()) errors.push('Project ID does not match Employee Master.')
@@ -71,7 +70,7 @@ function ForecastEntriesImportPage() {
   }
   const importRows = async () => { if (!validated || invalid.length || !valid.length) return setError('Correct every validation error before importing.'); const ledger = ledgers.data.find((item) => item.id === ledgerId); setImporting(true); try { await createRecords('forecastEntries', valid.map((row) => ({ ...row, errors: [], isValid: true, type: entryType, voucherNo, voucherDate, ledgerDocumentId: ledger.id, ledgerName: ledger.name, ledgerCategoryName: ledger.categoryName, groupName: ledger.groupName, sheetName, sourceFileName: fileName }))); setComplete(true) } catch (requestError) { setError(requestError.message) } finally { setImporting(false) } }
 
-  return <Stack spacing={3}><PageHeader section="Imports / Forecast Entries Upload" title="Forecast Entries Upload" description="Validate employee project details before importing monthly forecast hours." />
+  return <Stack spacing={3}><PageHeader section="Imports / Forecast Work Hours" title="Forecast Work Hours" description="Validate employee project details before importing monthly forecast hours." />
     {!activeLedgers.length && !ledgers.loading && <Alert severity="warning">Create an active Ledger in Ledger Master before importing Forecast Entries.</Alert>}
     <Card variant="outlined"><CardContent sx={{ p: { xs: 2, sm: 3 } }}><Stepper activeStep={complete ? 4 : validated ? 2 : fileName ? 1 : 0} alternativeLabel sx={{ mb: 3 }}>{['Upload', 'Validate', 'Review', 'Import'].map((step) => <Step key={step}><StepLabel>{step}</StepLabel></Step>)}</Stepper>
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
