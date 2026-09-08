@@ -56,10 +56,6 @@ function ActualWorkHoursImportPage() {
       if (!employeeId) errors.push('Emp ID is required.'); if (!employeeName) errors.push('Name is required.'); if (!projectName) errors.push('Project Name is required.'); if (!projectId) errors.push('Proj ID is required.'); if (!subProjectId) errors.push('Sub-proj ID is required.')
       const employee = employees.data.find((item) => clean(item.employeeId).toLowerCase() === employeeId.toLowerCase())
       if (employeeId && !employee) errors.push('Employee ID does not exist in Employee Master.')
-      if (employee && clean(employee.employeeName).toLowerCase() !== employeeName.toLowerCase()) errors.push('Employee Name does not match Employee Master.')
-      if (employee && clean(employee.projectName).toLowerCase() !== projectName.toLowerCase()) errors.push('Project Name does not match Employee Master.')
-      if (employee && clean(employee.projectId).toLowerCase() !== projectId.toLowerCase()) errors.push('Project ID does not match Employee Master.')
-      if (employee && clean(employee.subProjectId).toLowerCase() !== subProjectId.toLowerCase()) errors.push('Sub Project ID does not match Employee Master.')
       const monthDate = monthValue(month), actualHours = Number(actualHoursRaw)
       if (!monthDate) errors.push('Month is invalid.'); if (actualHoursRaw === '' || !Number.isFinite(actualHours) || actualHours < 0) errors.push('Actual HRS must be 0 or greater.')
       const perHourCost = monthDate ? costForMonth(employee, monthDate) : null
