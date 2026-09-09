@@ -55,10 +55,6 @@ function ForecastEntriesImportPage() {
       const employeeId = clean(fromColumn(source, ['Emp ID', 'Employee ID', 'EMPID'])), employeeName = clean(fromColumn(source, ['Name', 'Emp Name', 'Employee Name'])), projectName = clean(fromColumn(source, ['Project Name', 'ProjectName'])), projectId = clean(fromColumn(source, ['Proj ID', 'Project ID', 'ProjectId'])), subProjectId = clean(fromColumn(source, ['Sub-proj ID', 'Sub Project ID', 'SubProjectId'])), month = fromColumn(source, ['Month']), forecastHoursRaw = fromColumn(source, ['Forecast HRS', 'Forecast Hours']), errors = []
       if (!employeeId) errors.push('Emp ID is required.'); if (!employeeName) errors.push('Name is required.'); if (!projectName) errors.push('Project Name is required.'); if (!projectId) errors.push('Proj ID is required.'); if (!subProjectId) errors.push('Sub-proj ID is required.')
       const employee = employees.data.find((item) => clean(item.employeeId).toLowerCase() === employeeId.toLowerCase())
-      if (employee && clean(employee.employeeName).toLowerCase() !== employeeName.toLowerCase()) errors.push('Employee Name does not match Employee Master.')
-      if (employee && clean(employee.projectName).toLowerCase() !== projectName.toLowerCase()) errors.push('Project Name does not match Employee Master.')
-      if (employee && clean(employee.projectId).toLowerCase() !== projectId.toLowerCase()) errors.push('Project ID does not match Employee Master.')
-      if (employee && clean(employee.subProjectId).toLowerCase() !== subProjectId.toLowerCase()) errors.push('Sub Project ID does not match Employee Master.')
       const monthDate = monthValue(month), forecastHours = Number(forecastHoursRaw)
       if (!monthDate) errors.push('Month is invalid.'); if (forecastHoursRaw === '' || !Number.isFinite(forecastHours) || forecastHours < 0) errors.push('Forecast HRS must be 0 or greater.')
       const perHourCost = monthDate ? costForMonth(employee, monthDate) : null
