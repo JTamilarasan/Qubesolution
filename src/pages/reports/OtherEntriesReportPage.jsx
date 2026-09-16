@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
+import DownloadRoundedIcon from '@mui/icons-material/DownloadRounded'
 import { Alert, Box, Button, Card, IconButton, MenuItem, Snackbar, Stack, TableCell, TableRow, TextField } from '@mui/material'
 import FormDrawer from '../../components/common/FormDrawer'
 import PageHeader from '../../components/common/PageHeader'
@@ -8,6 +9,7 @@ import ContentState from '../../components/common/ContentState'
 import { useCollection } from '../../hooks/useCollection'
 import { updateRecord } from '../../services/firestoreService'
 import { formatDate, formatMonth } from '../../utils/formatters'
+import { exportExcel } from '../../utils/exportExcel'
 
 const blank = { voucherNo: '', voucherDate: '', type: '', ledgerName: '', employeeId: '', employeeName: '', projectName: '', projectId: '', subProjectId: '', monthDate: '', amount: '', sheetName: '' }
 const clean = (value) => String(value ?? '').trim()
@@ -23,6 +25,7 @@ function OtherEntriesReportPage() {
   const filtered = useMemo(() => records.data
     .filter((item) => (!appliedFilters.from || item.voucherDate >= appliedFilters.from) && (!appliedFilters.to || item.voucherDate <= appliedFilters.to) && (appliedFilters.type === 'All' || item.type === appliedFilters.type))
     .sort((a, b) => String(b.voucherDate).localeCompare(String(a.voucherDate))), [records.data, appliedFilters])
+  const download = () => exportExcel('Other-Entries-Report', 'Other Entries', ['Voucher No','Voucher Date','Type','Ledger','Emp ID','Employee Name','Project Name','Project ID','Sub Project ID','Month','Amount','Sheet'], filtered.map((item) => [item.voucherNo, formatDate(item.voucherDate), item.type, item.ledgerName, item.employeeId, item.employeeName, item.projectName, item.projectId, item.subProjectId, formatMonth(item.month), item.amount, item.sheetName]))
 
   const startEdit = (item) => { setEditing(item); setForm({ ...blank, ...item, monthDate: clean(item.monthDate || item.month).slice(0, 7) }); setError('') }
   const change = (field, value) => setForm((current) => ({ ...current, [field]: value }))
@@ -47,6 +50,7 @@ function OtherEntriesReportPage() {
         <TextField select label="Type" value={type} onChange={(event) => setType(event.target.value)}><MenuItem value="All">All</MenuItem><MenuItem value="Forecast">Forecast</MenuItem><MenuItem value="Actual">Actual</MenuItem></TextField>
         <Button type="submit" variant="contained">Submit</Button>
         <Button type="button" variant="outlined" onClick={() => { setFromDate(''); setToDate(''); setType('All'); setAppliedFilters({ from: '', to: '', type: 'All' }) }}>Reset</Button>
+        <Button type="button" variant="outlined" startIcon={<DownloadRoundedIcon />} onClick={download} disabled={!filtered.length}>Download Excel</Button>
       </Box>
       {records.loading || records.error || !filtered.length ? <ContentState loading={records.loading} error={records.error} title="No uploaded entries found" description="Change the filters or import Other Entries records." /> : <PaginatedTable minWidth={1550} columns={['Voucher No','Voucher Date','Type','Ledger','Emp ID','Employee Name','Project Name','Project ID','Sub Project ID','Month','Amount','Sheet'].map((label) => ({ label })).concat({ label: 'Actions', align: 'right' })} rows={filtered} renderRow={(item) => <TableRow hover key={item.id}><TableCell>{item.voucherNo}</TableCell><TableCell>{formatDate(item.voucherDate)}</TableCell><TableCell>{item.type}</TableCell><TableCell>{item.ledgerName}</TableCell><TableCell>{item.employeeId}</TableCell><TableCell>{item.employeeName}</TableCell><TableCell>{item.projectName}</TableCell><TableCell>{item.projectId}</TableCell><TableCell>{item.subProjectId}</TableCell><TableCell>{formatMonth(item.month)}</TableCell><TableCell>{item.amount}</TableCell><TableCell>{item.sheetName}</TableCell><TableCell align="right"><IconButton aria-label="Edit record" onClick={() => startEdit(item)}><EditOutlinedIcon /></IconButton></TableCell></TableRow>} />}
     </Card>

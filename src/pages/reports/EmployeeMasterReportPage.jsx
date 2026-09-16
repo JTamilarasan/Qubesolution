@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
-import { Autocomplete, Box, Card, Dialog, DialogContent, DialogTitle, Divider, IconButton, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from '@mui/material'
+import DownloadRoundedIcon from '@mui/icons-material/DownloadRounded'
+import { Autocomplete, Box, Button, Card, Dialog, DialogContent, DialogTitle, Divider, IconButton, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from '@mui/material'
 import PageHeader from '../../components/common/PageHeader'
 import ContentState from '../../components/common/ContentState'
 import StatusChip from '../../components/common/StatusChip'
 import { useCollection } from '../../hooks/useCollection'
 import { formatDate } from '../../utils/formatters'
+import { exportExcel } from '../../utils/exportExcel'
 
 const detailFields = (employee) => [
   ['Company', employee.company],
@@ -28,21 +30,22 @@ const detailFields = (employee) => [
 function EmployeeMasterReportPage() {
   const employees = useCollection('employees')
   const [selected, setSelected] = useState(null)
+  const download = () => exportExcel('Employee-Master-Report', 'Employees', ['Company','Employee ID','Employee Name','Sub Project ID','Sub Project Name','Project ID','Project Name','Project Category','Budgeted','Roll On Date','Roll Off Date','Date of Joining','Excelocom Experience','Final Customer','CTC','Status','Per Hour Cost Details'], employees.data.map((employee) => [employee.company, employee.employeeId, employee.employeeName, employee.subProjectId, employee.subProjectName, employee.projectId, employee.projectName, employee.projectCategoryName, employee.budgeted, formatDate(employee.rollOnDate), formatDate(employee.rollOffDate), formatDate(employee.dateOfJoining), employee.excelacomExperience ?? employee.experience ?? '', employee.finalCustomer, employee.ctc ?? '', employee.status, (employee.perHourCostDetails || []).map((item) => `${formatDate(item.date)}: ${item.perHourCost}`).join('; ')]))
 
   return <Stack spacing={3}>
     <PageHeader section="Reports / Employee Master" title="Employee Master Report" description="Search an Employee ID and view the complete employee master details." />
     <Card variant="outlined" sx={{ p: { xs: 2, sm: 3 } }}>
-      {employees.loading || employees.error ? <ContentState loading={employees.loading} error={employees.error} title="Unable to load employees" description="Employee Master records are not available." /> : <Autocomplete
+      {employees.loading || employees.error ? <ContentState loading={employees.loading} error={employees.error} title="Unable to load employees" description="Employee Master records are not available." /> : <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ sm: 'center' }} sx={{ maxWidth: 780 }}><Autocomplete
         options={employees.data}
         value={null}
         onChange={(_, employee) => employee && setSelected(employee)}
         getOptionLabel={(employee) => `${employee.employeeId || ''} — ${employee.employeeName || ''}`}
         isOptionEqualToValue={(option, value) => option.id === value.id}
         noOptionsText="No employee found"
-        sx={{ maxWidth: 520 }}
+        sx={{ width: '100%', maxWidth: 560, flex: '1 1 420px' }}
         renderInput={(params) => <TextField {...params} label="Employee ID" placeholder="Search Employee ID or Employee Name" />}
         filterOptions={(options, state) => { const term = state.inputValue.trim().toLowerCase(); return options.filter((employee) => `${employee.employeeId} ${employee.employeeName}`.toLowerCase().includes(term)) }}
-      />}
+      /><Button variant="outlined" startIcon={<DownloadRoundedIcon />} onClick={download} disabled={!employees.data.length} sx={{ minHeight: 56, px: 2.5, alignSelf: { xs: 'stretch', sm: 'center' }, whiteSpace: 'nowrap', flexShrink: 0 }}>Download Excel</Button></Stack>}
     </Card>
 
     <Dialog open={Boolean(selected)} onClose={() => setSelected(null)} fullWidth maxWidth="md" PaperProps={{ sx: { borderRadius: 3 } }}>
