@@ -30,12 +30,13 @@ const monthValue = (value) => {
   const adjusted = new Date(date.getTime() + (12 * 60 * 60 * 1000))
   return `${adjusted.getFullYear()}-${String(adjusted.getMonth() + 1).padStart(2, '0')}-01`
 }
-const nextVoucherNumber = (records) => {
+const nextVoucherNumber = (records, entryType) => {
+  const prefix = entryType === 'Forecast' ? 'FOE' : 'AOE'
   const highest = records.reduce((current, record) => {
-    const match = /^OE-(\d{6})$/.exec(clean(record.voucherNo))
+    const match = new RegExp(`^${prefix}-(\\d{6})$`).exec(clean(record.voucherNo))
     return match ? Math.max(current, Number(match[1])) : current
   }, 0)
-  return `OE-${String(highest + 1).padStart(6, '0')}`
+  return `${prefix}-${String(highest + 1).padStart(6, '0')}`
 }
 
 function OtherEntriesImportPage() {
@@ -56,7 +57,7 @@ function OtherEntriesImportPage() {
   const [importing, setImporting] = useState(false)
   const [complete, setComplete] = useState(false)
   const activeLedgers = ledgers.data.filter((item) => String(item.status).toLowerCase() === 'active')
-  const voucherNo = useMemo(() => nextVoucherNumber(entries.data), [entries.data])
+  const voucherNo = useMemo(() => nextVoucherNumber(entries.data, entryType), [entries.data, entryType])
   const valid = rows.filter((row) => row.isValid)
   const invalid = rows.filter((row) => !row.isValid)
 
@@ -75,7 +76,6 @@ function OtherEntriesImportPage() {
   const validate = () => {
     if (!voucherDate) return setError('Select Voucher Date before validation.')
     if (!ledgerId) return setError('Select Ledger Name before validation.')
-    if (!entryType) return setError('Select Type before validation.')
     if (!workbookRef.current || !sheetName) return setError('Select an Excel file and sheet name.')
     const raw = XLSX.utils.sheet_to_json(workbookRef.current.Sheets[sheetName], { defval: '', raw: true })
     if (!raw.length) return setError('The selected sheet does not contain records.')
@@ -99,7 +99,7 @@ function OtherEntriesImportPage() {
       const monthDate = monthValue(month)
       const amount = Number(amountRaw)
       if (!monthDate) errors.push('Month is invalid.')
-      if (amountRaw === '' || !Number.isFinite(amount)) errors.push('Amount must be a valid number.')
+      if (amountRaw === '' || !Number.isFinite(amount) || amount < 0) errors.push('Amount must be 0 or greater.')
       return { rowNumber: index + 2, employeeId, employeeName, projectName, projectId, subProjectId, month: formatMonth(month), monthDate, amount, errors, isValid: !errors.length }
     })
     setRows(checked); setValidated(true); setError('')
@@ -125,12 +125,13 @@ function OtherEntriesImportPage() {
         <TextField label="Voucher No" value={voucherNo} slotProps={{ input: { readOnly: true } }} />
         <TextField required type="date" label="Voucher Date" value={voucherDate} onChange={(event) => { setVoucherDate(event.target.value); setValidated(false) }} slotProps={{ inputLabel: { shrink: true } }} />
         <TextField select required label="Ledger Name" value={ledgerId} onChange={(event) => { setLedgerId(event.target.value); setValidated(false) }}>{activeLedgers.map((item) => <MenuItem key={item.id} value={item.id}>{item.name}</MenuItem>)}</TextField>
-        <TextField select required label="Type" value={entryType} onChange={(event) => { setEntryType(event.target.value); setValidated(false) }}><MenuItem value="Forecast">Forecast</MenuItem><MenuItem value="Actual">Actual</MenuItem></TextField>
+        <TextField select required label="Type" value={entryType} onChange={(event) => { setEntryType(event.target.value); setRows([]); setValidated(false); setComplete(false) }}><MenuItem value="Forecast">Forecast</MenuItem><MenuItem value="Actual">Actual</MenuItem></TextField>
         <TextField select required label="Upload Sheet Name" value={sheetName} onChange={(event) => { setSheetName(event.target.value); setRows([]); setValidated(false) }} disabled={!sheetNames.length}>{sheetNames.map((name) => <MenuItem key={name} value={name}>{name}</MenuItem>)}</TextField>
       </Box>
+      {!complete && <Alert severity="info" sx={{ mb: 2 }}><strong>Required Excel headings:</strong> Emp ID, Name, Project Name, Proj ID, Sub-proj ID, Month, Amount</Alert>}
       {!complete && <Box onClick={() => inputRef.current?.click()} sx={{ border: '1.5px dashed', borderColor: 'divider', borderRadius: 2.5, p: { xs: 4, sm: 5 }, textAlign: 'center', cursor: 'pointer', '&:hover': { borderColor: 'primary.main', bgcolor: 'primary.50' } }}><CloudUploadRoundedIcon sx={{ fontSize: 42, color: 'primary.main' }} /><Typography fontWeight={650} sx={{ mt: 1 }}>Drop your Excel file here</Typography><Typography variant="body2" color="text.secondary">or browse from your computer · XLSX, XLS</Typography><Button type="button" variant="contained" sx={{ mt: 2 }}>Browse File</Button><input ref={inputRef} hidden type="file" accept=".xlsx,.xls" onChange={readFile} />{fileName && <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>Selected: {fileName}</Typography>}</Box>}
       {complete && <Alert severity="success">{valid.length} Other Entries records imported successfully.</Alert>}
-      {!complete && <Stack direction="row" justifyContent="flex-end" sx={{ mt: 2, gap: '12px' }}><Button variant="outlined" onClick={validate} disabled={!fileName || !ledgerId || !voucherDate || !entryType}>Validate</Button><Button variant="contained" onClick={importRows} disabled={!validated || Boolean(invalid.length) || !valid.length || importing}>{importing ? 'Importing…' : 'Import'}</Button></Stack>}
+      {!complete && <Stack direction="row" justifyContent="flex-end" sx={{ mt: 2, gap: '12px' }}><Button variant="outlined" onClick={validate} disabled={!fileName || !ledgerId || !voucherDate}>Validate</Button><Button variant="contained" onClick={importRows} disabled={!validated || Boolean(invalid.length) || !valid.length || importing}>{importing ? 'Importing…' : 'Import'}</Button></Stack>}
       {importing && <LinearProgress sx={{ mt: 1 }} />}
     </CardContent></Card>
     {validated && <Card variant="outlined"><Stack direction="row" sx={{ p: 2, gap: '8px' }}><Chip color="success" label={`Valid ${valid.length}`} /><Chip color={invalid.length ? 'error' : 'default'} label={`Invalid ${invalid.length}`} /></Stack><PaginatedTable minWidth={1100} columns={['Row','Emp ID','Name','Project Name','Proj ID','Sub-proj ID','Month','Amount','Validation'].map((label) => ({ label }))} rows={rows} renderRow={(row) => <TableRow key={row.rowNumber}><TableCell>{row.rowNumber}</TableCell><TableCell>{row.employeeId}</TableCell><TableCell>{row.employeeName}</TableCell><TableCell>{row.projectName}</TableCell><TableCell>{row.projectId}</TableCell><TableCell>{row.subProjectId}</TableCell><TableCell>{row.month}</TableCell><TableCell>{row.amount}</TableCell><TableCell><Chip size="small" color={row.isValid ? 'success' : 'error'} label={row.isValid ? 'Valid' : row.errors.join(' ')} /></TableCell></TableRow>} /></Card>}

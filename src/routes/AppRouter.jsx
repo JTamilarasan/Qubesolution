@@ -47,6 +47,8 @@ function AppRouter() {
       <Route path="/imports/actual-work-hours" element={<ActualWorkHoursImportPage />} />
       <Route path="/imports/forecast-entries" element={<ForecastEntriesImportPage />} />
       <Route path="/imports/other-entries" element={<OtherEntriesImportPage />} />
+      <Route path="/imports/forecast-cost-entry" element={<Navigate to="/imports/other-entries" replace />} />
+      <Route path="/imports/actual-cost-entry" element={<Navigate to="/imports/other-entries" replace />} />
       <Route path="/reports/actual-work-hours" element={<ActualWorkHoursReportPage />} />
       <Route path="/reports/forecast-entries" element={<ForecastEntriesReportPage />} />
       <Route path="/reports/other-entries" element={<OtherEntriesReportPage />} />
