@@ -21,6 +21,7 @@ import ForecastEntriesImportPage from '../pages/operations/ForecastEntriesImport
 import ForecastEntriesReportPage from '../pages/reports/ForecastEntriesReportPage'
 import OtherEntriesImportPage from '../pages/operations/OtherEntriesImportPage'
 import OtherEntriesReportPage from '../pages/reports/OtherEntriesReportPage'
+import ProfitAndLossReportPage from '../pages/reports/ProfitAndLossReportPage'
 import EmployeeMasterReportPage from '../pages/reports/EmployeeMasterReportPage'
 import ProtectedRoute from './ProtectedRoute'
 import PublicRoute from './PublicRoute'
@@ -52,6 +53,7 @@ function AppRouter() {
       <Route path="/reports/actual-work-hours" element={<ActualWorkHoursReportPage />} />
       <Route path="/reports/forecast-entries" element={<ForecastEntriesReportPage />} />
       <Route path="/reports/other-entries" element={<OtherEntriesReportPage />} />
+      <Route path="/reports/profit-and-loss" element={<ProfitAndLossReportPage />} />
       <Route path="/reports/employee-master" element={<EmployeeMasterReportPage />} />
     </Route>
     <Route path="*" element={<Navigate to="/dashboard" replace />} />
