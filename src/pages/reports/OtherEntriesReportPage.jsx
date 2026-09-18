@@ -1,13 +1,15 @@
 import { useMemo, useState } from 'react'
+import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import DownloadRoundedIcon from '@mui/icons-material/DownloadRounded'
 import { Alert, Box, Button, Card, IconButton, MenuItem, Snackbar, Stack, TableCell, TableRow, TextField } from '@mui/material'
+import ConfirmDialog from '../../components/common/ConfirmDialog'
 import FormDrawer from '../../components/common/FormDrawer'
 import PageHeader from '../../components/common/PageHeader'
 import PaginatedTable from '../../components/common/PaginatedTable'
 import ContentState from '../../components/common/ContentState'
 import { useCollection } from '../../hooks/useCollection'
-import { updateRecord } from '../../services/firestoreService'
+import { deleteRecord, updateRecord } from '../../services/firestoreService'
 import { formatDate, formatMonth } from '../../utils/formatters'
 import { exportExcel } from '../../utils/exportExcel'
 
@@ -20,7 +22,7 @@ function OtherEntriesReportPage() {
   const [toDate, setToDate] = useState('')
   const [type, setType] = useState('All')
   const [appliedFilters, setAppliedFilters] = useState({ from: '', to: '', type: 'All' })
-  const [editing, setEditing] = useState(null), [form, setForm] = useState(blank)
+  const [editing, setEditing] = useState(null), [form, setForm] = useState(blank), [deleting, setDeleting] = useState(null)
   const [saving, setSaving] = useState(false), [error, setError] = useState(''), [notice, setNotice] = useState('')
   const filtered = useMemo(() => records.data
     .filter((item) => (!appliedFilters.from || item.voucherDate >= appliedFilters.from) && (!appliedFilters.to || item.voucherDate <= appliedFilters.to) && (appliedFilters.type === 'All' || item.type === appliedFilters.type))
@@ -40,6 +42,7 @@ function OtherEntriesReportPage() {
       setEditing(null); setNotice('Other entry updated.')
     } catch (requestError) { setError(requestError.message) } finally { setSaving(false) }
   }
+  const remove = async () => { setSaving(true); try { await deleteRecord('otherEntries', deleting.id); setDeleting(null); setNotice('Other entry deleted.') } catch (requestError) { setNotice(requestError.message) } finally { setSaving(false) } }
 
   return <Stack spacing={3}>
     <PageHeader section="Reports / Other Entries" title="Other Entries Report" description="View imported forecast and actual amounts by voucher date." />
@@ -52,7 +55,7 @@ function OtherEntriesReportPage() {
         <Button type="button" variant="outlined" onClick={() => { setFromDate(''); setToDate(''); setType('All'); setAppliedFilters({ from: '', to: '', type: 'All' }) }}>Reset</Button>
         <Button type="button" variant="outlined" startIcon={<DownloadRoundedIcon />} onClick={download} disabled={!filtered.length}>Download Excel</Button>
       </Box>
-      {records.loading || records.error || !filtered.length ? <ContentState loading={records.loading} error={records.error} title="No uploaded entries found" description="Change the filters or import Other Entries records." /> : <PaginatedTable minWidth={1550} columns={['Voucher No','Voucher Date','Type','Ledger','Emp ID','Employee Name','Project Name','Project ID','Sub Project ID','Month','Amount','Sheet'].map((label) => ({ label })).concat({ label: 'Actions', align: 'right' })} rows={filtered} renderRow={(item) => <TableRow hover key={item.id}><TableCell>{item.voucherNo}</TableCell><TableCell>{formatDate(item.voucherDate)}</TableCell><TableCell>{item.type}</TableCell><TableCell>{item.ledgerName}</TableCell><TableCell>{item.employeeId}</TableCell><TableCell>{item.employeeName}</TableCell><TableCell>{item.projectName}</TableCell><TableCell>{item.projectId}</TableCell><TableCell>{item.subProjectId}</TableCell><TableCell>{formatMonth(item.month)}</TableCell><TableCell>{item.amount}</TableCell><TableCell>{item.sheetName}</TableCell><TableCell align="right"><IconButton aria-label="Edit record" onClick={() => startEdit(item)}><EditOutlinedIcon /></IconButton></TableCell></TableRow>} />}
+      {records.loading || records.error || !filtered.length ? <ContentState loading={records.loading} error={records.error} title="No uploaded entries found" description="Change the filters or import Other Entries records." /> : <PaginatedTable minWidth={1550} columns={['Voucher No','Voucher Date','Type','Ledger','Emp ID','Employee Name','Project Name','Project ID','Sub Project ID','Month','Amount','Sheet'].map((label) => ({ label })).concat({ label: 'Actions', align: 'right' })} rows={filtered} renderRow={(item) => <TableRow hover key={item.id}><TableCell>{item.voucherNo}</TableCell><TableCell>{formatDate(item.voucherDate)}</TableCell><TableCell>{item.type}</TableCell><TableCell>{item.ledgerName}</TableCell><TableCell>{item.employeeId}</TableCell><TableCell>{item.employeeName}</TableCell><TableCell>{item.projectName}</TableCell><TableCell>{item.projectId}</TableCell><TableCell>{item.subProjectId}</TableCell><TableCell>{formatMonth(item.month)}</TableCell><TableCell>{item.amount}</TableCell><TableCell>{item.sheetName}</TableCell><TableCell align="right"><IconButton aria-label="Edit record" onClick={() => startEdit(item)}><EditOutlinedIcon /></IconButton><IconButton color="error" aria-label="Delete record" onClick={() => setDeleting(item)}><DeleteOutlineRoundedIcon /></IconButton></TableCell></TableRow>} />}
     </Card>
     <FormDrawer open={Boolean(editing)} onClose={() => setEditing(null)} title="Edit Other Entry" subtitle="Change the imported record values and save." onSubmit={save} saving={saving} submitLabel="Save Changes" width={760}>
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
@@ -65,6 +68,7 @@ function OtherEntriesReportPage() {
         <TextField required type="number" label="Amount" value={form.amount} onChange={(e) => change('amount', e.target.value)} slotProps={{ htmlInput: { min: 0, step: '0.01' } }} /><TextField required label="Sheet" value={form.sheetName} onChange={(e) => change('sheetName', e.target.value)} />
       </Box>
     </FormDrawer>
+    <ConfirmDialog open={Boolean(deleting)} title="Delete Other Entry Record?" description="Are you sure you want to permanently delete this record?" onCancel={() => setDeleting(null)} onConfirm={remove} busy={saving} />
     <Snackbar open={Boolean(notice)} autoHideDuration={5000} onClose={() => setNotice('')}><Alert severity="info">{notice}</Alert></Snackbar>
   </Stack>
 }

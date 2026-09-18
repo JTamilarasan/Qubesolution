@@ -1,8 +1,9 @@
 import { useRef, useState } from 'react'
 import CloudUploadRoundedIcon from '@mui/icons-material/CloudUploadRounded'
-import { Alert, Box, Button, Card, CardContent, Chip, Stack, Step, StepLabel, Stepper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
+import { Alert, Box, Button, Card, CardContent, Chip, Stack, Step, StepLabel, Stepper, TableCell, TableRow, Typography } from '@mui/material'
 import * as XLSX from 'xlsx'
 import PageHeader from '../../components/common/PageHeader'
+import PaginatedTable from '../../components/common/PaginatedTable'
 import { useCollection } from '../../hooks/useCollection'
 
 function PayrollImportPage() {
@@ -40,7 +41,7 @@ function PayrollImportPage() {
     </CardContent></Card>
     {rows.length > 0 && <Card variant="outlined">
       <Stack direction="row" gap={1} sx={{ p: 2 }} flexWrap="wrap"><Chip label={`Total ${rows.length}`} /><Chip color="success" label={`Matched ${rows.filter((row) => row.matched).length}`} /><Chip color="warning" label={`Unmatched ${rows.filter((row) => !row.matched).length}`} /></Stack>
-      <TableContainer><Table><TableHead><TableRow><TableCell>Row</TableCell><TableCell>Employee ID</TableCell><TableCell>Employee</TableCell><TableCell>Validation</TableCell><TableCell>Issue</TableCell></TableRow></TableHead><TableBody>{rows.map((row) => <TableRow key={row.row}><TableCell>{row.row}</TableCell><TableCell>{row.employeeId}</TableCell><TableCell>{row.employeeName}</TableCell><TableCell>{row.matched ? 'Matched' : 'Unmatched'}</TableCell><TableCell>{row.issue || '—'}</TableCell></TableRow>)}</TableBody></Table></TableContainer>
+      <PaginatedTable tabs={[{ label: 'Success', value: 'success', filter: (row) => row.matched }, { label: 'Failure', value: 'failure', filter: (row) => !row.matched }]} columns={[{ label: 'Row' }, { label: 'Employee ID' }, { label: 'Employee' }, { label: 'Validation' }, { label: 'Issue' }]} rows={rows} renderRow={(row) => <TableRow key={row.row}><TableCell>{row.row}</TableCell><TableCell>{row.employeeId}</TableCell><TableCell>{row.employeeName}</TableCell><TableCell>{row.matched ? 'Matched' : 'Unmatched'}</TableCell><TableCell>{row.issue || '—'}</TableCell></TableRow>} />
     </Card>}
   </Stack>
 }
