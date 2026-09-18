@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react'
 import DownloadRoundedIcon from '@mui/icons-material/DownloadRounded'
-import { Alert, Box, Button, Card, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from '@mui/material'
+import { Alert, Box, Button, Card, Dialog, DialogContent, DialogTitle, IconButton, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
 import * as XLSX from 'xlsx'
 import PageHeader from '../../components/common/PageHeader'
 import { useCollection } from '../../hooks/useCollection'
+import { formatDate, formatMonth } from '../../utils/formatters'
 
 const groups = ['Revenue', 'Direct Cost', 'Indirect Cost']
 const quarters = ['Q1', 'Q2', 'Q3', 'Q4']
@@ -27,9 +28,10 @@ const recordDate = (record) => {
 const total = (rows) => rows.reduce((values, row) => values.map((value, index) => value + row.values[index]), emptyValues())
 const subtract = (left, right) => left.map((value, index) => value - right[index])
 const display = (value) => number(value).toLocaleString('en-IN', { maximumFractionDigits: 2 })
+const mergeDetails = (rows) => Array.from({ length: 8 }, (_, index) => rows.flatMap((row) => row.details[index]))
 
-const ValueCells = ({ values, percent = false }) => values.map((value, index) => <TableCell key={index} align="right" sx={{ fontWeight: percent ? 700 : 'inherit' }}>{percent ? `${value.toFixed(2)}%` : display(value)}</TableCell>)
-const SummaryRow = ({ label, values, percent = false }) => <TableRow sx={{ bgcolor: 'primary.50', '& td': { fontWeight: 750 } }}><TableCell>{label}</TableCell><ValueCells values={values} percent={percent} /></TableRow>
+const ValueCells = ({ values, details, percent = false, onValueClick }) => values.map((value, index) => <TableCell key={index} align="right" sx={{ fontWeight: percent ? 700 : 'inherit' }}>{details?.[index]?.length ? <Button variant="text" size="small" onClick={() => onValueClick(details[index], `${details[index][0].groupName || 'Ledger'} - ${details[index][0].ledgerName || ''}`)} sx={{ minWidth: 0, p: 0, fontWeight: 'inherit', color: 'inherit', textDecoration: 'underline', textUnderlineOffset: 3 }}>{percent ? `${value.toFixed(2)}%` : display(value)}</Button> : (percent ? `${value.toFixed(2)}%` : display(value))}</TableCell>)
+const SummaryRow = ({ label, values, details, percent = false, onValueClick }) => <TableRow sx={{ bgcolor: 'primary.50', '& td': { fontWeight: 750 } }}><TableCell>{label}</TableCell><ValueCells values={values} details={details} percent={percent} onValueClick={onValueClick} /></TableRow>
 
 function ProfitAndLossReportPage() {
   const projects = useCollection('projects')
@@ -39,6 +41,8 @@ function ProfitAndLossReportPage() {
   const otherEntries = useCollection('otherEntries')
   const [year, setYear] = useState('')
   const [projectId, setProjectId] = useState('')
+  const [detailRows, setDetailRows] = useState([])
+  const [detailTitle, setDetailTitle] = useState('')
 
   const records = useMemo(() => [
     ...forecastEntries.data.map((item) => ({ ...item, reportType: 'Forecast', reportAmount: item.forecastAmount ?? item.amount })),
@@ -53,7 +57,7 @@ function ProfitAndLossReportPage() {
   const report = useMemo(() => {
     if (!year || !projectId) return null
     const rows = new Map()
-    ledgers.data.filter((ledger) => groups.includes(ledger.groupName)).forEach((ledger) => rows.set(key(ledger.groupName, ledger.name), { group: ledger.groupName, ledger: ledger.name, values: emptyValues() }))
+    ledgers.data.filter((ledger) => groups.includes(ledger.groupName)).forEach((ledger) => rows.set(key(ledger.groupName, ledger.name), { group: ledger.groupName, ledger: ledger.name, values: emptyValues(), details: Array.from({ length: 8 }, () => []) }))
     records.forEach((record) => {
       const date = recordDate(record)
       if (!date || String(date.getFullYear()) !== String(year) || clean(record.projectId) !== projectId || !types.includes(record.reportType)) return
@@ -62,16 +66,18 @@ function ProfitAndLossReportPage() {
       const ledgerName = clean(record.ledgerName || ledger?.name)
       if (!groups.includes(group) || !ledgerName) return
       const rowKey = key(group, ledgerName)
-      if (!rows.has(rowKey)) rows.set(rowKey, { group, ledger: ledgerName, values: emptyValues() })
+      if (!rows.has(rowKey)) rows.set(rowKey, { group, ledger: ledgerName, values: emptyValues(), details: Array.from({ length: 8 }, () => []) })
       const quarter = Math.floor(date.getMonth() / 3)
       const typeOffset = record.reportType === 'Forecast' ? 0 : 1
-      rows.get(rowKey).values[(quarter * 2) + typeOffset] += number(record.reportAmount)
+      const valueIndex = (quarter * 2) + typeOffset
+      rows.get(rowKey).values[valueIndex] += number(record.reportAmount)
+      rows.get(rowKey).details[valueIndex].push(record)
     })
     const grouped = Object.fromEntries(groups.map((group) => [group, [...rows.values()].filter((row) => row.group === group && row.values.some((value) => value !== 0)).sort((a, b) => a.ledger.localeCompare(b.ledger))]))
     const revenue = total(grouped.Revenue), direct = total(grouped['Direct Cost']), indirect = total(grouped['Indirect Cost'])
     const gross = subtract(revenue, direct), net = subtract(gross, indirect)
     const pm = net.map((value, index) => revenue[index] ? (value / revenue[index]) * 100 : 0)
-    return { grouped, revenue, direct, indirect, gross, net, pm }
+    return { grouped, revenue, direct, indirect, gross, net, pm, revenueDetails: mergeDetails(grouped.Revenue), directDetails: mergeDetails(grouped['Direct Cost']), indirectDetails: mergeDetails(grouped['Indirect Cost']) }
   }, [year, projectId, records, ledgers.data, ledgerDetails])
 
   const download = () => {
@@ -100,6 +106,7 @@ function ProfitAndLossReportPage() {
 
   const loading = projects.loading || ledgers.loading || forecastEntries.loading || actualWorkHours.loading || otherEntries.loading
   const errors = projects.error || ledgers.error || forecastEntries.error || actualWorkHours.error || otherEntries.error
+  const openDetails = (rows, title) => { setDetailRows(rows); setDetailTitle(title); }
 
   return <Stack spacing={3}>
     <PageHeader section="Reports / P&L Report" title="P&L Report" description="Compare quarterly forecast and actual profit and loss by project." />
@@ -118,19 +125,23 @@ function ProfitAndLossReportPage() {
       </TableHead>
       <TableBody>
         <TableRow><TableCell colSpan={9} sx={{ fontWeight: 800, bgcolor: 'grey.100' }}>Revenue</TableCell></TableRow>
-        {report.grouped.Revenue.map((row) => <TableRow key={key(row.group, row.ledger)}><TableCell>{row.ledger}</TableCell><ValueCells values={row.values} /></TableRow>)}
-        <SummaryRow label="Total Revenue" values={report.revenue} />
+        {report.grouped.Revenue.map((row) => <TableRow key={key(row.group, row.ledger)}><TableCell>{row.ledger}</TableCell><ValueCells values={row.values} details={row.details} onValueClick={openDetails} /></TableRow>)}
+        <SummaryRow label="Total Revenue" values={report.revenue} details={report.revenueDetails} onValueClick={openDetails} />
         <TableRow><TableCell colSpan={9} sx={{ fontWeight: 800, bgcolor: 'grey.100' }}>Less Direct Cost</TableCell></TableRow>
-        {report.grouped['Direct Cost'].map((row) => <TableRow key={key(row.group, row.ledger)}><TableCell>{row.ledger}</TableCell><ValueCells values={row.values} /></TableRow>)}
-        <SummaryRow label="Total Direct Cost" values={report.direct} />
-        <SummaryRow label="Gross Margin" values={report.gross} />
+        {report.grouped['Direct Cost'].map((row) => <TableRow key={key(row.group, row.ledger)}><TableCell>{row.ledger}</TableCell><ValueCells values={row.values} details={row.details} onValueClick={openDetails} /></TableRow>)}
+        <SummaryRow label="Total Direct Cost" values={report.direct} details={report.directDetails} onValueClick={openDetails} />
+        <SummaryRow label="Gross Margin" values={report.gross} details={report.revenueDetails.map((items, index) => [...items, ...report.directDetails[index]])} onValueClick={openDetails} />
         <TableRow><TableCell colSpan={9} sx={{ fontWeight: 800, bgcolor: 'grey.100' }}>Less Indirect Cost</TableCell></TableRow>
-        {report.grouped['Indirect Cost'].map((row) => <TableRow key={key(row.group, row.ledger)}><TableCell>{row.ledger}</TableCell><ValueCells values={row.values} /></TableRow>)}
-        <SummaryRow label="Total Indirect Cost" values={report.indirect} />
-        <SummaryRow label="Net Margin" values={report.net} />
-        <SummaryRow label="PM%" values={report.pm} percent />
+        {report.grouped['Indirect Cost'].map((row) => <TableRow key={key(row.group, row.ledger)}><TableCell>{row.ledger}</TableCell><ValueCells values={row.values} details={row.details} onValueClick={openDetails} /></TableRow>)}
+        <SummaryRow label="Total Indirect Cost" values={report.indirect} details={report.indirectDetails} onValueClick={openDetails} />
+        <SummaryRow label="Net Margin" values={report.net} details={report.revenueDetails.map((items, index) => [...items, ...report.directDetails[index], ...report.indirectDetails[index]])} onValueClick={openDetails} />
+        <SummaryRow label="PM%" values={report.pm} details={report.revenueDetails} percent onValueClick={openDetails} />
       </TableBody>
     </Table></TableContainer></Card>}
+    <Dialog open={Boolean(detailRows.length)} onClose={() => setDetailRows([])} maxWidth="lg" fullWidth>
+      <DialogTitle sx={{ fontWeight: 700 }}>{detailTitle || 'Transaction Details'}<IconButton aria-label="Close details" onClick={() => setDetailRows([])} sx={{ position: 'absolute', right: 12, top: 10 }}>×</IconButton></DialogTitle>
+      <DialogContent dividers><Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>{detailRows.length} record(s) contribute to this amount.</Typography><TableContainer><Table size="small"><TableHead><TableRow>{['Voucher No','Voucher Date','Type','Ledger','Employee','Project','Month','Amount'].map((label) => <TableCell key={label}>{label}</TableCell>)}</TableRow></TableHead><TableBody>{detailRows.map((record) => <TableRow key={`${record.id}-${record.reportType}`}><TableCell>{record.voucherNo || '-'}</TableCell><TableCell>{formatDate(record.voucherDate) || '-'}</TableCell><TableCell>{record.reportType || '-'}</TableCell><TableCell>{record.ledgerName || '-'}</TableCell><TableCell>{record.employeeName || record.employeeId || '-'}</TableCell><TableCell>{record.projectName || record.projectId || '-'}</TableCell><TableCell>{formatMonth(record.monthDate || record.month) || '-'}</TableCell><TableCell>{display(record.reportAmount)}</TableCell></TableRow>)}</TableBody></Table></TableContainer></DialogContent>
+    </Dialog>
   </Stack>
 }
 
