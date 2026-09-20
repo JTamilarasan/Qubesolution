@@ -20,7 +20,9 @@ import ActualWorkHoursReportPage from '../pages/reports/ActualWorkHoursReportPag
 import ForecastEntriesImportPage from '../pages/operations/ForecastEntriesImportPage'
 import ForecastEntriesReportPage from '../pages/reports/ForecastEntriesReportPage'
 import OtherEntriesImportPage from '../pages/operations/OtherEntriesImportPage'
+import RevenueEntriesImportPage from '../pages/operations/RevenueEntriesImportPage'
 import OtherEntriesReportPage from '../pages/reports/OtherEntriesReportPage'
+import RevenueEntriesReportPage from '../pages/reports/RevenueEntriesReportPage'
 import ProfitAndLossReportPage from '../pages/reports/ProfitAndLossReportPage'
 import EmployeeMasterReportPage from '../pages/reports/EmployeeMasterReportPage'
 import ProtectedRoute from './ProtectedRoute'
@@ -48,11 +50,13 @@ function AppRouter() {
       <Route path="/imports/actual-work-hours" element={<ActualWorkHoursImportPage />} />
       <Route path="/imports/forecast-entries" element={<ForecastEntriesImportPage />} />
       <Route path="/imports/other-entries" element={<OtherEntriesImportPage />} />
+      <Route path="/imports/revenue-entries" element={<RevenueEntriesImportPage />} />
       <Route path="/imports/forecast-cost-entry" element={<Navigate to="/imports/other-entries" replace />} />
       <Route path="/imports/actual-cost-entry" element={<Navigate to="/imports/other-entries" replace />} />
       <Route path="/reports/actual-work-hours" element={<ActualWorkHoursReportPage />} />
       <Route path="/reports/forecast-entries" element={<ForecastEntriesReportPage />} />
       <Route path="/reports/other-entries" element={<OtherEntriesReportPage />} />
+      <Route path="/reports/revenue-entries" element={<RevenueEntriesReportPage />} />
       <Route path="/reports/profit-and-loss" element={<ProfitAndLossReportPage />} />
       <Route path="/reports/employee-master" element={<EmployeeMasterReportPage />} />
     </Route>

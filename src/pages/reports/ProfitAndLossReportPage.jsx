@@ -39,6 +39,7 @@ function ProfitAndLossReportPage() {
   const forecastEntries = useCollection('forecastEntries')
   const actualWorkHours = useCollection('actualWorkHours')
   const otherEntries = useCollection('otherEntries')
+  const revenueEntries = useCollection('revenueEntries')
   const [year, setYear] = useState('')
   const [projectId, setProjectId] = useState('')
   const [detailRows, setDetailRows] = useState([])
@@ -48,7 +49,8 @@ function ProfitAndLossReportPage() {
     ...forecastEntries.data.map((item) => ({ ...item, reportType: 'Forecast', reportAmount: item.forecastAmount ?? item.amount })),
     ...actualWorkHours.data.map((item) => ({ ...item, reportType: 'Actual', reportAmount: item.actualHoursAmount ?? item.amount })),
     ...otherEntries.data.map((item) => ({ ...item, reportType: item.type, reportAmount: item.amount })),
-  ], [forecastEntries.data, actualWorkHours.data, otherEntries.data])
+    ...revenueEntries.data.map((item) => ({ ...item, reportType: item.type, reportAmount: item.amount })),
+  ], [forecastEntries.data, actualWorkHours.data, otherEntries.data, revenueEntries.data])
 
   const years = useMemo(() => [...new Set(records.map(recordDate).filter(Boolean).map((date) => date.getFullYear()))].sort((a, b) => b - a), [records])
   const selectedProject = projects.data.find((project) => clean(project.projectId) === projectId)
@@ -104,8 +106,8 @@ function ProfitAndLossReportPage() {
     XLSX.writeFile(workbook, `P&L-${projectId}-${year}.xlsx`)
   }
 
-  const loading = projects.loading || ledgers.loading || forecastEntries.loading || actualWorkHours.loading || otherEntries.loading
-  const errors = projects.error || ledgers.error || forecastEntries.error || actualWorkHours.error || otherEntries.error
+  const loading = projects.loading || ledgers.loading || forecastEntries.loading || actualWorkHours.loading || otherEntries.loading || revenueEntries.loading
+  const errors = projects.error || ledgers.error || forecastEntries.error || actualWorkHours.error || otherEntries.error || revenueEntries.error
   const openDetails = (rows, title) => { setDetailRows(rows); setDetailTitle(title); }
 
   return <Stack spacing={3}>
