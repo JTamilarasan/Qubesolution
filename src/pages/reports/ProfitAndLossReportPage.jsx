@@ -8,6 +8,7 @@ import { formatDate, formatMonth } from '../../utils/formatters'
 
 const groups = ['Revenue', 'Direct Cost', 'Indirect Cost']
 const quarters = ['Q1', 'Q2', 'Q3', 'Q4']
+const quarterMonths = ['Jan–Mar', 'Apr–Jun', 'Jul–Sep', 'Oct–Dec']
 const types = ['Forecast', 'Actual']
 const clean = (value) => String(value ?? '').trim()
 const key = (group, ledger) => `${group}::${ledger}`
@@ -35,6 +36,7 @@ const SummaryRow = ({ label, values, details, percent = false, onValueClick }) =
 
 function ProfitAndLossReportPage() {
   const projects = useCollection('projects')
+  const subProjects = useCollection('subProjects')
   const ledgers = useCollection('ledgers')
   const forecastEntries = useCollection('forecastEntries')
   const actualWorkHours = useCollection('actualWorkHours')
@@ -42,6 +44,7 @@ function ProfitAndLossReportPage() {
   const revenueEntries = useCollection('revenueEntries')
   const [year, setYear] = useState('')
   const [projectId, setProjectId] = useState('')
+  const [subProjectId, setSubProjectId] = useState('')
   const [detailRows, setDetailRows] = useState([])
   const [detailTitle, setDetailTitle] = useState('')
 
@@ -53,16 +56,17 @@ function ProfitAndLossReportPage() {
   ], [forecastEntries.data, actualWorkHours.data, otherEntries.data, revenueEntries.data])
 
   const years = useMemo(() => [...new Set(records.map(recordDate).filter(Boolean).map((date) => date.getFullYear()))].sort((a, b) => b - a), [records])
+  const selectedYear = year || String(years[0] || '')
   const selectedProject = projects.data.find((project) => clean(project.projectId) === projectId)
   const ledgerDetails = useMemo(() => new Map(ledgers.data.map((ledger) => [clean(ledger.name).toLowerCase(), ledger])), [ledgers.data])
 
   const report = useMemo(() => {
-    if (!year || !projectId) return null
+    if (!selectedYear || !projectId) return null
     const rows = new Map()
     ledgers.data.filter((ledger) => groups.includes(ledger.groupName)).forEach((ledger) => rows.set(key(ledger.groupName, ledger.name), { group: ledger.groupName, ledger: ledger.name, values: emptyValues(), details: Array.from({ length: 8 }, () => []) }))
     records.forEach((record) => {
       const date = recordDate(record)
-      if (!date || String(date.getFullYear()) !== String(year) || clean(record.projectId) !== projectId || !types.includes(record.reportType)) return
+      if (!date || String(date.getFullYear()) !== selectedYear || clean(record.projectId) !== projectId || (subProjectId && clean(record.subProjectId) !== subProjectId) || !types.includes(record.reportType)) return
       const ledger = ledgerDetails.get(clean(record.ledgerName).toLowerCase())
       const group = clean(record.groupName || ledger?.groupName)
       const ledgerName = clean(record.ledgerName || ledger?.name)
@@ -80,12 +84,12 @@ function ProfitAndLossReportPage() {
     const gross = subtract(revenue, direct), net = subtract(gross, indirect)
     const pm = net.map((value, index) => revenue[index] ? (value / revenue[index]) * 100 : 0)
     return { grouped, revenue, direct, indirect, gross, net, pm, revenueDetails: mergeDetails(grouped.Revenue), directDetails: mergeDetails(grouped['Direct Cost']), indirectDetails: mergeDetails(grouped['Indirect Cost']) }
-  }, [year, projectId, records, ledgers.data, ledgerDetails])
+  }, [selectedYear, projectId, subProjectId, records, ledgers.data, ledgerDetails])
 
   const download = () => {
     if (!report) return
-    const heading = [year, selectedProject?.projectName || projectId, '', '', '', '', '', '', '']
-    const quarterRow = ['', ...quarters.flatMap((quarter) => [quarter, ''])]
+    const heading = [selectedYear, selectedProject?.projectName || projectId, '', '', '', '', '', '', '']
+    const quarterRow = ['', ...quarters.flatMap((quarter, index) => [`${quarter} (${quarterMonths[index]})`, ''])]
     const typeRow = ['', ...quarters.flatMap(() => types)]
     const body = []
     const addSection = (label, rows, totalLabel, totals) => {
@@ -103,26 +107,27 @@ function ProfitAndLossReportPage() {
     worksheet['!cols'] = [{ wch: 28 }, ...Array(8).fill({ wch: 14 })]
     const workbook = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(workbook, worksheet, 'P&L Report')
-    XLSX.writeFile(workbook, `P&L-${projectId}-${year}.xlsx`)
+    XLSX.writeFile(workbook, `P&L-${projectId}${subProjectId ? `-${subProjectId}` : ''}-${selectedYear}.xlsx`)
   }
 
-  const loading = projects.loading || ledgers.loading || forecastEntries.loading || actualWorkHours.loading || otherEntries.loading || revenueEntries.loading
-  const errors = projects.error || ledgers.error || forecastEntries.error || actualWorkHours.error || otherEntries.error || revenueEntries.error
+  const loading = projects.loading || subProjects.loading || ledgers.loading || forecastEntries.loading || actualWorkHours.loading || otherEntries.loading || revenueEntries.loading
+  const errors = projects.error || subProjects.error || ledgers.error || forecastEntries.error || actualWorkHours.error || otherEntries.error || revenueEntries.error
   const openDetails = (rows, title) => { setDetailRows(rows); setDetailTitle(title); }
 
   return <Stack spacing={3}>
     <PageHeader section="Reports / P&L Report" title="P&L Report" description="Compare quarterly forecast and actual profit and loss by project." />
     <Card variant="outlined"><Box sx={{ p: 2.5, display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
-      <TextField select label="Year" value={year} onChange={(event) => setYear(event.target.value)} sx={{ minWidth: 160 }}>{years.map((item) => <MenuItem key={item} value={String(item)}>{item}</MenuItem>)}</TextField>
-      <TextField select label="Project" value={projectId} onChange={(event) => setProjectId(event.target.value)} sx={{ minWidth: 280 }}>{projects.data.map((project) => <MenuItem key={project.id} value={clean(project.projectId)}>{project.projectId} — {project.projectName}</MenuItem>)}</TextField>
+      <TextField select label="Year" value={selectedYear} onChange={(event) => setYear(event.target.value)} sx={{ minWidth: 160 }}>{years.map((item) => <MenuItem key={item} value={String(item)}>{item}</MenuItem>)}</TextField>
+      <TextField select label="Project" value={projectId} onChange={(event) => { setProjectId(event.target.value); setSubProjectId('') }} sx={{ minWidth: 280 }}>{projects.data.map((project) => <MenuItem key={project.id} value={clean(project.projectId)}>{project.projectId} — {project.projectName}</MenuItem>)}</TextField>
+      <TextField select label="Sub Project" value={subProjectId} onChange={(event) => setSubProjectId(event.target.value)} disabled={!projectId} sx={{ minWidth: 280 }}><MenuItem value="">All Sub Projects</MenuItem>{subProjects.data.filter((item) => clean(item.projectId) === projectId).map((item) => <MenuItem key={item.id} value={clean(item.subProjectId)}>{item.subProjectId} — {item.subProjectName}</MenuItem>)}</TextField>
       <Button variant="contained" startIcon={<DownloadRoundedIcon />} onClick={download} disabled={!report}>Download Excel</Button>
     </Box></Card>
     {errors && <Alert severity="error">{errors}</Alert>}
-    {!loading && (!year || !projectId) && <Alert severity="info">Select a Year and Project to generate the P&L report.</Alert>}
+    {!loading && (!selectedYear || !projectId) && <Alert severity="info">Select a Year and Project to generate the P&L report.</Alert>}
     {report && <Card variant="outlined"><TableContainer><Table sx={{ minWidth: 1200 }}>
       <TableHead>
-        <TableRow><TableCell rowSpan={3} sx={{ fontWeight: 800, minWidth: 240 }}>{year}</TableCell><TableCell colSpan={8} align="center" sx={{ fontSize: 18, fontWeight: 800 }}>{selectedProject?.projectName || projectId}</TableCell></TableRow>
-        <TableRow>{quarters.map((quarter) => <TableCell key={quarter} colSpan={2} align="center" sx={{ fontWeight: 800 }}>{quarter}</TableCell>)}</TableRow>
+        <TableRow><TableCell rowSpan={3} sx={{ fontWeight: 800, minWidth: 240 }}>{selectedYear}</TableCell><TableCell colSpan={8} align="center" sx={{ fontSize: 18, fontWeight: 800 }}>{selectedProject?.projectName || projectId}</TableCell></TableRow>
+        <TableRow>{quarters.map((quarter, index) => <TableCell key={quarter} colSpan={2} align="center" sx={{ fontWeight: 800 }}>{quarter} ({quarterMonths[index]})</TableCell>)}</TableRow>
         <TableRow>{quarters.flatMap((quarter) => types.map((type) => <TableCell key={`${quarter}-${type}`} align="center" sx={{ fontWeight: 700 }}>{type}</TableCell>))}</TableRow>
       </TableHead>
       <TableBody>

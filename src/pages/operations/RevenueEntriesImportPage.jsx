@@ -64,7 +64,7 @@ function RevenueEntriesImportPage() {
     if (!file) return
     setError(''); setRows([]); setValidated(false); setComplete(false)
     try {
-      const workbook = XLSX.read(await file.arrayBuffer(), { type: 'array', cellDates: true })
+      const workbook = XLSX.read(await file.arrayBuffer(), { type: 'array', cellDates: false })
       workbookRef.current = workbook
       setFileName(file.name); setSheetNames(workbook.SheetNames); setSheetName(workbook.SheetNames[0] || '')
     } catch (requestError) { setError(`Unable to read workbook. ${requestError.message}`) }
